@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Troy Coll troy.coll@gmail.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.boardman.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.boardman.json)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -68,7 +68,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".boardman" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
+		viper.SetConfigType("json")
 		viper.SetConfigName(".boardman")
 	}
 
