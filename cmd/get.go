@@ -6,10 +6,11 @@ var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "",
 	Long:  "",
+	Run: ,
 }
 
 func init() {
-
+	rootCmd.AddCommand(getCmd)
 }
 
 func get() {

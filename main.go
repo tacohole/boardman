@@ -15,8 +15,8 @@ limitations under the License.
 */
 package main
 
-import "boardman/cmd"
+import "boardman/cmd/root"
 
 func main() {
-	cmd.Execute()
+	root.Execute()
 }
