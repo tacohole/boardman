@@ -10,9 +10,7 @@ import (
 	"github.com/jszwec/csvutil"
 )
 
-type Schema []string
-
-func readCsv(filePath string, s Schema) ([]struct{}, error) {
+func ReadCsv(filePath string, schema string) ([]struct{}, error) {
 	var objArray []struct{}
 
 	file, err := os.Open(filePath)
@@ -20,14 +18,12 @@ func readCsv(filePath string, s Schema) ([]struct{}, error) {
 		return nil, fmt.Errorf("file at %s cannot be opened: %s", filePath, err)
 	}
 
-	r, err := io.ReadAll(file)
+	csvReader := csv.NewReader(file)
+
+	dec, err := csvutil.NewDecoder(csvReader, schema)
 	if err != nil {
 		return nil, err
 	}
-
-	csvReader := csv.NewReader(r)
-
-	dec, err := csvutil.NewDecoder(csvReader, s)
 
 	for {
 		var o struct{}
@@ -40,4 +36,9 @@ func readCsv(filePath string, s Schema) ([]struct{}, error) {
 	}
 
 	return objArray, nil
+}
+
+func WriteCsv(filePath string, schema string) error {
+
+	return nil
 }

@@ -1,0 +1,3 @@
+ID,Name,Fields
+1,Player,"uuid,firstname,lastname,team,season,ppg,rpg,apg,spg,bpg,fg%,ws,vorp"
+2,Team,"uuid,city,nickname,season,wins,losses,coach"

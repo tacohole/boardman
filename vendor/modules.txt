@@ -16,6 +16,9 @@ github.com/hashicorp/hcl/json/token
 # github.com/inconshreveable/mousetrap v1.0.0
 ## explicit
 github.com/inconshreveable/mousetrap
+# github.com/jszwec/csvutil v1.6.0
+## explicit; go 1.13
+github.com/jszwec/csvutil
 # github.com/magiconair/properties v1.8.5
 ## explicit; go 1.13
 github.com/magiconair/properties

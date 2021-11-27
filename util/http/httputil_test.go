@@ -1,7 +1,6 @@
-package httputil_test
+package httputil
 
 import (
-	"boardman/util/httputil"
 	"testing"
 )
 
@@ -10,8 +9,8 @@ const (
 	getUrl = "http://www.google.com"
 )
 
-func testMakeHttpRequest(t *testing.T) {
-	_, err := httputil.MakeHttpRequest(method, getUrl, nil, "")
+func TestMakeHttpRequest(t *testing.T) {
+	_, err := MakeHttpRequest(method, getUrl, nil, "")
 	if err != nil {
 		t.Fail()
 	}
