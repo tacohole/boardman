@@ -17,7 +17,9 @@ package root
 
 import (
 	"boardman/util/config"
+	configConsts "boardman/util/config"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -51,31 +53,32 @@ func init() {
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", config.ConfigPath+config.ConfigFileName))
 	// RootCmd.PersistentFlags().StringVar(&database.dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
-	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, fmt.Sprint("Include additional logging information"))
+	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, fmt.Sprintln("Include additional logging information"))
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.SetDefault(configConst.logLevelConfig, "")
+	viper.SetDefault(configConsts.DbUrlEnvironmentName, "postgresql://user:secret@localhost:5432")
+	viper.SetDefault(configConsts.ApiUrlEnvironmentName, "http://localhost:3000")
 
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".boardman" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("json")
-		viper.SetConfigName(".boardman")
+		// Search config in config path with name ".boardman" (without extension).
+		viper.AddConfigPath(config.ConfigPath)
+		viper.SetConfigName(config.ConfigFileNameNoExtension)
 	}
-
-	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Printf("There was a problem with config file %s and it has been ignored: %s", cfgFile, err)
 	}
+
+	if err := viper.BindPFlag("verbose", RootCmd.Flags().Lookup("verbose")); err != nil {
+		log.Println(err.Error())
+	}
+
 }
