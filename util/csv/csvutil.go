@@ -6,12 +6,18 @@ import (
 	"io"
 	"log"
 	"os"
+	"reflect"
 
 	"github.com/jszwec/csvutil"
 )
 
-func ReadCsv(filePath string, schema string) ([]struct{}, error) {
+func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
 	var objArray []struct{}
+
+	schemaKeys, err := SchemaHeadersToString(schema)
+	if err != nil {
+		return nil, err
+	}
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -20,7 +26,7 @@ func ReadCsv(filePath string, schema string) ([]struct{}, error) {
 
 	csvReader := csv.NewReader(file)
 
-	dec, err := csvutil.NewDecoder(csvReader, schema)
+	dec, err := csvutil.NewDecoder(csvReader, schemaKeys)
 	if err != nil {
 		return nil, err
 	}
@@ -41,4 +47,13 @@ func ReadCsv(filePath string, schema string) ([]struct{}, error) {
 func WriteCsv(filePath string, schema string) error {
 
 	return nil
+}
+
+func SchemaHeadersToString(schema struct{}) (string, error) {
+
+	headers := string.(reflect.VisibleFields())
+
+
+
+	return headers, nil
 }
