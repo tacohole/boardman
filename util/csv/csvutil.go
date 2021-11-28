@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"boardman/internal/schema"
+	"github.com/tacohole/boardman/internal/schema"
 
 	"github.com/jszwec/csvutil"
 )

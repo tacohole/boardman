@@ -1,4 +1,4 @@
-module boardman
+module github.com/tacohole/boardman
 
 go 1.17
 

@@ -1,8 +1,8 @@
 package get
 
 import (
-	"boardman/internal/schema"
-	"boardman/util/csvutil"
+	"github.com/tacohole/boardman/internal/schema"
+	"github.com/tacohole/boardman/util/csvutil"
 
 	"github.com/spf13/cobra"
 )
@@ -14,7 +14,7 @@ var getAllCmd = &cobra.Command{
 }
 
 func init() {
-	getAllCmd.Flags().StringVar(&writeTo, "output", "", "output type")
+	getAllCmd.Flags().StringVar(&writeTo, "output", "", "output type, options are JSON or csv")
 
 }
 
