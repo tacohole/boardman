@@ -5,27 +5,17 @@ type Data interface {
 }
 
 type Source struct {
-	ID           int
-	Name         string
-	Url          string
-	Endpoint     string
-	AuthRequired bool
-	AuthType     string
-	ResponseId   int
-	Response     Response
-	DbSchemaId   int
-	DbSchema     DbSchema
-}
-
-type Response struct {
 	ID              int
 	Name            string
-	SourceId        int
-	DbSchemaId      int
+	Url             string
+	AuthRequired    bool
+	AuthType        string
 	ContentType     string
 	DefaultPageSize int
 	PageIndexVar    string
 	NextPageVar     string
+	DbSchemaId      int
+	DbSchema        DbSchema
 }
 
 type DbSchema struct {

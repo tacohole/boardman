@@ -1,6 +1,7 @@
 package csvutil
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -38,7 +39,7 @@ func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
 		if err := dec.Decode(&schema); err == io.EOF {
 			break
 		} else if err != nil {
-			log.Printf("error decoding into csv: %s", err)
+			log.Printf("error decoding %s into csv: %s", schema, err)
 		}
 		objArray = append(objArray, schema)
 	}
@@ -46,8 +47,27 @@ func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
 	return objArray, nil
 }
 
-func WriteCsv(filePath string, schema string) error {
+func WriteCsv(filePath string, data []struct{}) error {
+	// check filename
 
+	var buf bytes.Buffer
+
+	w := csv.NewWriter(&buf)
+
+	enc := csvutil.NewEncoder(w)
+	defer w.Flush()
+
+	for _, row := range data {
+		if err := enc.Encode(row); err != nil {
+			return fmt.Errorf("error: %s", err)
+		}
+	}
+
+	// write to filename
+
+	if err := w.Error(); err != nil {
+		return fmt.Errorf("error: %s", err)
+	}
 	return nil
 }
 
