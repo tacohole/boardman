@@ -7,6 +7,9 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
+
+	"boardman/internal/schema"
 
 	"github.com/jszwec/csvutil"
 )
@@ -14,7 +17,7 @@ import (
 func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
 	var objArray []struct{}
 
-	schemaKeys, err := SchemaHeadersToString(schema)
+	schemaKeys, err := StructKeysToString(schema)
 	if err != nil {
 		return nil, err
 	}
@@ -32,13 +35,12 @@ func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
 	}
 
 	for {
-		var o struct{}
-		if err := dec.Decode(&o); err == io.EOF {
+		if err := dec.Decode(&schema); err == io.EOF {
 			break
 		} else if err != nil {
-			log.Fatal(err)
+			log.Printf("error decoding into csv: %s", err)
 		}
-		objArray = append(objArray, o)
+		objArray = append(objArray, schema)
 	}
 
 	return objArray, nil
@@ -49,11 +51,17 @@ func WriteCsv(filePath string, schema string) error {
 	return nil
 }
 
-func SchemaHeadersToString(schema struct{}) (string, error) {
+func StructKeysToString(data schema.Data) (string, error) {
+	var headerSlice []string
+	structFields := reflect.VisibleFields(data)
 
-	headers := string.(reflect.VisibleFields())
+	for _, field := range structFields {
+		header := field.Name
 
+		headerSlice = append(headerSlice, header)
+	}
 
+	headers := strings.Join(headerSlice, ",")
 
 	return headers, nil
 }

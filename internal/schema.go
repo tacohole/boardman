@@ -1,5 +1,9 @@
 package schema
 
+type Data interface {
+	StructKeysToString() string
+}
+
 type Source struct {
 	ID           int
 	Name         string
@@ -9,22 +13,22 @@ type Source struct {
 	AuthType     string
 	ResponseId   int
 	Response     Response
-	SchemaId     int
-	Schema       Schema
+	DbSchemaId   int
+	DbSchema     DbSchema
 }
 
 type Response struct {
 	ID              int
 	Name            string
 	SourceId        int
-	SchemaId        int
+	DbSchemaId      int
 	ContentType     string
 	DefaultPageSize int
 	PageIndexVar    string
 	NextPageVar     string
 }
 
-type Schema struct {
+type DbSchema struct {
 	ID     int
 	Name   string
 	Fields []string
