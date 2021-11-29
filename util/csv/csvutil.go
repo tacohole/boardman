@@ -1,7 +1,6 @@
 package csvHelpers
 
 import (
-	"bytes"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -50,14 +49,12 @@ func ReadCsv(filePath string) ([]schema.Source, error) {
 }
 
 func WriteCsv(fileName string, data []schema.DbSchema) error {
-	_, err := os.Create(fileName)
+	file, err := os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Failed to create file %s: %s", fileName, err)
 	}
 
-	var buf bytes.Buffer
-
-	w := csv.NewWriter(&buf)
+	w := csv.NewWriter(file)
 
 	enc := csvutil.NewEncoder(w)
 	defer w.Flush()
@@ -67,8 +64,6 @@ func WriteCsv(fileName string, data []schema.DbSchema) error {
 			return fmt.Errorf("error: %s", err)
 		}
 	}
-
-	// write to filename
 
 	if err := w.Error(); err != nil {
 		return fmt.Errorf("error: %s", err)
