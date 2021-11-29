@@ -16,11 +16,12 @@ limitations under the License.
 package root
 
 import (
-	"boardman/util/config"
-	configConsts "boardman/util/config"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/tacohole/boardman/util/config"
+	configConsts "github.com/tacohole/boardman/util/config"
 
 	"github.com/spf13/cobra"
 

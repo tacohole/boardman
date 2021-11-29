@@ -1,4 +1,4 @@
-package csvutil
+package csvHelpers
 
 import (
 	"bytes"
@@ -7,21 +7,23 @@ import (
 	"io"
 	"log"
 	"os"
-	"reflect"
 	"strings"
 
-	"github.com/tacohole/boardman/internal/schema"
+	schema "github.com/tacohole/boardman/internal"
 
 	"github.com/jszwec/csvutil"
 )
 
-func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
-	var objArray []struct{}
+func ReadCsv(filePath string) ([]schema.Source, error) {
+	var sourceArray []schema.Source
+	var source schema.Source
 
-	schemaKeys, err := StructKeysToString(schema)
+	headerSlice, err := csvutil.Header(source, "csv")
 	if err != nil {
 		return nil, err
 	}
+
+	headers := strings.Join(headerSlice, ",")
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -30,25 +32,28 @@ func ReadCsv(filePath string, schema struct{}) ([]struct{}, error) {
 
 	csvReader := csv.NewReader(file)
 
-	dec, err := csvutil.NewDecoder(csvReader, schemaKeys)
+	dec, err := csvutil.NewDecoder(csvReader, headers)
 	if err != nil {
 		return nil, err
 	}
 
 	for {
-		if err := dec.Decode(&schema); err == io.EOF {
+		if err := dec.Decode(&source); err == io.EOF {
 			break
 		} else if err != nil {
-			log.Printf("error decoding %s into csv: %s", schema, err)
+			log.Printf("error decoding %s into csv: %s", source.Name, err)
 		}
-		objArray = append(objArray, schema)
+		sourceArray = append(sourceArray, source)
 	}
 
-	return objArray, nil
+	return sourceArray, nil
 }
 
-func WriteCsv(filePath string, data []struct{}) error {
-	// check filename
+func WriteCsv(fileName string, data []schema.DbSchema) error {
+	_, err := os.Create(fileName)
+	if err != nil {
+		fmt.Printf("Failed to create file %s: %s", fileName, err)
+	}
 
 	var buf bytes.Buffer
 
@@ -69,19 +74,4 @@ func WriteCsv(filePath string, data []struct{}) error {
 		return fmt.Errorf("error: %s", err)
 	}
 	return nil
-}
-
-func StructKeysToString(data schema.Data) (string, error) {
-	var headerSlice []string
-	structFields := reflect.VisibleFields(data)
-
-	for _, field := range structFields {
-		header := field.Name
-
-		headerSlice = append(headerSlice, header)
-	}
-
-	headers := strings.Join(headerSlice, ",")
-
-	return headers, nil
 }

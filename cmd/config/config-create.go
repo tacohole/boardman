@@ -1,11 +1,12 @@
 package config
 
 import (
-	"boardman/util/config"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/tacohole/boardman/util/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

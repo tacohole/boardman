@@ -1,9 +1,5 @@
 package schema
 
-type Data interface {
-	StructKeysToString() string
-}
-
 type Source struct {
 	ID              int
 	Name            string

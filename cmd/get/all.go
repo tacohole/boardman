@@ -2,12 +2,14 @@ package get
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"time"
 
-	"github.com/tacohole/boardman/internal/schema"
-	"github.com/tacohole/boardman/util/csvutil"
-	"github.com/tacohole/boardman/util/httputil"
+	schema "github.com/tacohole/boardman/internal"
+	csvHelpers "github.com/tacohole/boardman/util/csv"
+	httpHelpers "github.com/tacohole/boardman/util/http"
+	jsonHelpers "github.com/tacohole/boardman/util/json"
 
 	"github.com/spf13/cobra"
 )
@@ -26,6 +28,10 @@ func init() {
 func getAll(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
+	var data []schema.DbSchema
+
+	t := time.Now().Format(time.UnixDate)
+
 	sourceCache, err := getSourceCache()
 	if err != nil {
 		log.Fatalf("sources file unavailable: %s", err)
@@ -33,30 +39,40 @@ func getAll(cmd *cobra.Command, args []string) {
 
 	for _, source := range sourceCache {
 		// get some data
-		resp, err := httputil.MakeHttpRequest("GET", source.Url, nil, "")
+		resp, err := httpHelpers.MakeHttpRequest("GET", source.Url, nil, "")
 		if err != nil {
 			log.Printf("error:", err)
 		}
 		defer resp.Body.Close()
 
-		var schema source.DbSchema
-
-		err = json.Unmarshal(resp.Body, &schema)
+		r, err := io.ReadAll(resp.Body)
 		if err != nil {
-			log.Printf("error", err)
+			log.Printf("error: %s", err)
+		}
+
+		err = json.Unmarshal(r, &data)
+		if err != nil {
+			log.Printf("error: %s", err)
 		}
 
 		if writeTo == "csv" {
 			// write a csv
-			fileName := (source.Name + time.Now())
-
-			csvutil.WriteCsv(fileName, &schema)
+			fileName := (source.Name + t + ".csv")
+			err = csvHelpers.WriteCsv(fileName, data)
+			if err != nil {
+				log.Printf("Error writing csv %s: %s", fileName, err)
+			}
 		}
 
-	}
+		if writeTo == "JSON" {
+			// write a JSON file
+			fileName := (source.Name + t + ".json")
+			err = jsonHelpers.WriteJson(fileName, data)
+			if err != nil {
+				log.Printf("Error writing JSON file %s: %s", fileName, err)
+			}
+		}
 
-	if writeTo == "JSON" {
-		// write a JSON file
 	}
 
 }
@@ -64,7 +80,7 @@ func getAll(cmd *cobra.Command, args []string) {
 func getSourceCache() ([]schema.Source, error) {
 	var sourceCache []schema.Source
 
-	sourceCache, err := csvutil.ReadCsv("~/sources.csv", schema.Source)
+	sourceCache, err := csvHelpers.ReadCsv("~/sources.csv")
 	if err != nil {
 		return nil, err
 	}

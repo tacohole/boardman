@@ -1,7 +1,7 @@
 package config
 
 import (
-	"boardman/util/config"
+	"github.com/tacohole/boardman/util/config"
 
 	"github.com/spf13/cobra"
 )
