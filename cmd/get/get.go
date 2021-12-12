@@ -12,11 +12,10 @@ var getCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 }
 
-var verbose bool
-var source string
+//var verbose bool
 var writeTo string
 
 func loadDefaultVariables() {
-	verbose = viper.GetBool("verbose")
+	//verbose = viper.GetBool("verbose")
 	writeTo = viper.GetString("writeTo")
 }

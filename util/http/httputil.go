@@ -4,16 +4,22 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
+type Endpoint struct {
+	PageNumber int `json:"current_page"`
+	PageSize   int `json:"per_page"`
+	NextPage   int `json:"next_page"`
+}
+
 const (
-	defaultApiUrl = "http://localhost:3000"
-	httpTimeout   = 1 * time.Minute
+	BaseUrl     = "https://www.balldontlie.io/api/v1/"
+	Players     = "players"
+	Teams       = "teams"
+	Stats       = "stats"
+	httpTimeout = 30 * time.Second
 )
 
 func MakeHttpRequest(method string, url string, data []byte, token string) (*http.Response, error) {
@@ -36,16 +42,6 @@ func MakeHttpRequest(method string, url string, data []byte, token string) (*htt
 		return response, fmt.Errorf("%s request to %s failed with status %d", method, url, response.StatusCode)
 	}
 	return response, nil
-}
-
-func GetApiUrl() string {
-	apiUrl := viper.GetString("API_URL")
-
-	if apiUrl == defaultApiUrl {
-		log.Printf("Warning: default API URL in use %s", defaultApiUrl)
-	}
-
-	return apiUrl
 }
 
 func setHeaders(request *http.Request, headers map[string]string) error {

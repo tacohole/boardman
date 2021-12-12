@@ -8,14 +8,12 @@ import (
 	"os"
 	"strings"
 
-	schema "github.com/tacohole/boardman/internal"
-
 	"github.com/jszwec/csvutil"
 )
 
-func ReadCsv(filePath string) ([]schema.Source, error) {
-	var sourceArray []schema.Source
-	var source schema.Source
+func ReadCsv(filePath string) ([]struct{}, error) {
+	var sourceArray []struct{}
+	var source struct{}
 
 	headerSlice, err := csvutil.Header(source, "csv")
 	if err != nil {
@@ -40,33 +38,10 @@ func ReadCsv(filePath string) ([]schema.Source, error) {
 		if err := dec.Decode(&source); err == io.EOF {
 			break
 		} else if err != nil {
-			log.Printf("error decoding %s into csv: %s", source.Name, err)
+			log.Printf("error decoding into csv: %s", err)
 		}
 		sourceArray = append(sourceArray, source)
 	}
 
 	return sourceArray, nil
-}
-
-func WriteCsv(fileName string, data []schema.DbSchema) error {
-	file, err := os.Create(fileName)
-	if err != nil {
-		fmt.Printf("Failed to create file %s: %s", fileName, err)
-	}
-
-	w := csv.NewWriter(file)
-
-	enc := csvutil.NewEncoder(w)
-	defer w.Flush()
-
-	for _, row := range data {
-		if err := enc.Encode(row); err != nil {
-			return fmt.Errorf("error: %s", err)
-		}
-	}
-
-	if err := w.Error(); err != nil {
-		return fmt.Errorf("error: %s", err)
-	}
-	return nil
 }

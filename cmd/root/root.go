@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/tacohole/boardman/util/config"
-	configConsts "github.com/tacohole/boardman/util/config"
 
 	"github.com/spf13/cobra"
 
@@ -59,8 +58,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.SetDefault(configConsts.DbUrlEnvironmentName, "postgresql://user:secret@localhost:5432")
-	viper.SetDefault(configConsts.ApiUrlEnvironmentName, "http://localhost:3000")
+	viper.SetDefault(config.DbUrlEnvironmentName, "postgresql://user:secret@localhost:5432")
 
 	if cfgFile != "" {
 		// Use config file from the flag.

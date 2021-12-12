@@ -8,7 +8,7 @@ import (
 	schema "github.com/tacohole/boardman/internal"
 )
 
-func WriteJson(fileName string, schema []schema.DbSchema) error {
+func WriteJson(fileName string, schema []schema.Player) error {
 	file, err := os.OpenFile(fileName, os.O_CREATE, os.ModePerm)
 	if err != nil {
 		log.Printf("Failed to create file %s: %s", fileName, err)

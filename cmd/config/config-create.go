@@ -50,17 +50,10 @@ func generateConfig(cmd *cobra.Command, args []string) {
 func setConfigVars(logLevel string, dbUrl string, apiUrl string) {
 	var config *config.Configuration
 
-	if strings.TrimSpace(logLevel) != "" {
-		viper.Set(config.LogLevel, logLevel)
-	}
-
 	if strings.TrimSpace(dbUrl) != "" {
 		viper.Set(config.DbUrl, dbUrl)
 	}
 
-	if strings.TrimSpace(apiUrl) != "" {
-		viper.Set(config.ApiUrl, apiUrl)
-	}
 }
 
 func writeConfig() {

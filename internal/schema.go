@@ -1,21 +1,51 @@
 package schema
 
-type Source struct {
-	ID              int      `csv:"ID"json:"_id"`
-	Name            string   `csv:"Name"json:"name"`
-	Url             string   `csv:"URL"json:"url"`
-	AuthRequired    bool     `csv:"Auth Required"json:"authRequired"`
-	AuthType        string   `csv:"Auth Type"json:"authType"`
-	ContentType     string   `csv:"Content Type"json:"contentType"`
-	DefaultPageSize int      `csv:"Page Size"json:"pageSize"`
-	PageIndexVar    string   `csv:"Page Index"json:"pageIndex"`
-	NextPageVar     string   `csv:"Next Page"json:"nextPage"`
-	DbSchemaId      int      `csv:"DB Schema ID"json:"dbSchemaId"`
-	DbSchema        DbSchema `csv:"DB Schema Name"json:"dbSchema"`
+type PageData struct {
+	TotalPages    int `json:"total_pages"`
+	PageIndex     int `json:"current_page"`
+	NextPageIndex int `json:"next_page"`
+	PageSize      int `json:"per_page"`
+	ItemCount     int `json:"total_count"`
 }
 
-type DbSchema struct {
-	ID     int      `csv:"ID"json:"_id"`
-	Name   string   `csv:"Name"json:"name"`
-	Fields []string `csv:"Fields"json:"fields"`
+type Player struct {
+	ID          int    `json:"id"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	CurrentTeam Team   `json:"team"`
+}
+
+type Team struct {
+	ID         int    `json:"id"`
+	Name       string `json:"full_name"`
+	Abbrev     string `json:"abbreviation"`
+	Conference string `json:"conference"`
+	Division   string `json:"division"`
+}
+
+type Season struct {
+	LeagueYear string
+	Champion   Team
+	WConfChamp Team
+	EConfChamp Team
+	MVP        Player
+}
+
+type TeamYear struct {
+	TeamCache    Team
+	Season       Season
+	Wins         int
+	Losses       int
+	WinPct       int
+	ConfRank     int
+	OvrRank      int
+	MadePlayoffs bool
+	Roster       []Player
+	Coach        string
+}
+
+type PlayerYear struct {
+	Player Player
+	Season Season
+	Stats  []int
 }
