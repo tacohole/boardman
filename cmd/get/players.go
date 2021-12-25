@@ -36,16 +36,13 @@ func getPlayerData(cmd *cobra.Command, args []string) {
 
 	t := time.Now().Format(time.UnixDate)
 
-	var response struct {
-		Data []schema.Player `json:"data"`
-		Meta schema.PageData `json:"meta"`
-	}
+	var response schema.Page
 
 	pageIndex := 0
 
-	getUrl := httpHelpers.BaseUrl + "players" + fmt.Sprint(pageIndex)
+	getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(pageIndex)
 
-	for pageIndex := 0; pageIndex < response.Meta.TotalPages; pageIndex++ {
+	for pageIndex := 0; pageIndex < response.PageData.TotalPages; pageIndex++ {
 		// get some data
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, nil, "")
 		if err != nil {

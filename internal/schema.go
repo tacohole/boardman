@@ -1,27 +1,4 @@
-package schema
-
-type PageData struct {
-	TotalPages    int `json:"total_pages"`
-	PageIndex     int `json:"current_page"`
-	NextPageIndex int `json:"next_page"`
-	PageSize      int `json:"per_page"`
-	ItemCount     int `json:"total_count"`
-}
-
-type Player struct {
-	ID          int    `json:"id"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	CurrentTeam Team   `json:"team"`
-}
-
-type Team struct {
-	ID         int    `json:"id"`
-	Name       string `json:"full_name"`
-	Abbrev     string `json:"abbreviation"`
-	Conference string `json:"conference"`
-	Division   string `json:"division"`
-}
+package internal
 
 type Season struct {
 	LeagueYear string
@@ -30,6 +7,10 @@ type Season struct {
 	EConfChamp Team
 	MVP        Player
 }
+
+// get champ
+// get conf champ
+// get mvp
 
 type TeamYear struct {
 	TeamCache    Team
@@ -43,6 +24,12 @@ type TeamYear struct {
 	Roster       []Player
 	Coach        string
 }
+
+// sum wins
+// sum losses
+// sum wpct
+// get conf rank
+// build roster
 
 type PlayerYear struct {
 	Player Player

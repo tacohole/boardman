@@ -19,17 +19,18 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/tacohole/boardman/util/config"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tacohole/boardman/util/config"
 
 	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile string
-	verbose bool
+	cfgFile   string
+	dbTimeout time.Duration
+	verbose   bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -52,7 +53,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", config.ConfigPath+config.ConfigFileName))
-	// RootCmd.PersistentFlags().StringVar(&database.dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
+	RootCmd.PersistentFlags().DurationVar(&dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, fmt.Sprintln("Include additional logging information"))
 }
 
