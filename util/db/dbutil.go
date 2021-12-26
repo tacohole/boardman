@@ -8,7 +8,7 @@ import (
 	"github.com/tacohole/boardman/util/config"
 )
 
-func dbConn() {
+func DbConn() {
 	psqlconn := fmt.Sprintf(config.DbUrlEnvironmentName)
 
 	db, err := sql.Open("postgres", psqlconn)
@@ -24,4 +24,8 @@ func dbConn() {
 	}
 
 	fmt.Printf("Connected to PostgreSQL")
+}
+
+func InsertRow() {
+
 }

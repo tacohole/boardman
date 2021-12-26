@@ -16,7 +16,7 @@ type Player struct {
 }
 
 // get player by ID
-func (p *Player) getPlayerById(id string) (*Player, error) {
+func (p *Player) GetPlayerById(id string) (*Player, error) {
 	getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(p.ID)
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
@@ -39,34 +39,35 @@ func (p *Player) getPlayerById(id string) (*Player, error) {
 }
 
 // get all players
-func (p *Player) getAllPlayers() ([]Player, error) {
+func (p *Player) GetAllPlayers() ([]Player, error) {
 	allPlayers := []Player{}
 
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Players
-
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	r, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
 	var page Page
 
-	err = json.Unmarshal(r, &page)
-	if err != nil {
-		return nil, err
-	}
-	for _, d := range page.Data {
-		p.ID = d.ID
-		p.FirstName = d.FirstName
-		p.LastName = d.LastName
-		p.CurrentTeam = d.CurrentTeam
-		allPlayers = append(allPlayers, *p)
-	}
+	for pageIndex := 0; pageIndex < page.PageData.NextPageIndex; pageIndex++ {
+		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(pageIndex)
+		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
 
+		r, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(r, &page)
+		if err != nil {
+			return nil, err
+		}
+		for _, d := range page.Data {
+			p.ID = d.ID
+			p.FirstName = d.FirstName
+			p.LastName = d.LastName
+			p.CurrentTeam = d.CurrentTeam
+			allPlayers = append(allPlayers, *p)
+		}
+	}
 	return allPlayers, nil
 }

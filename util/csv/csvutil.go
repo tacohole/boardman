@@ -2,6 +2,7 @@ package csvHelpers
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/jszwec/csvutil"
+	schema "github.com/tacohole/boardman/internal"
 )
 
 func ReadCsv(filePath string) ([]struct{}, error) {
@@ -44,4 +46,84 @@ func ReadCsv(filePath string) ([]struct{}, error) {
 	}
 
 	return sourceArray, nil
+}
+
+func WriteTeamCsv(fileName string, data []schema.Data) error {
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Printf("Failed to create file %s: %s", fileName, err)
+	}
+
+	w := csv.NewWriter(file)
+
+	enc := csvutil.NewEncoder(w)
+	defer w.Flush()
+
+	for _, row := range data {
+		if err := enc.Encode(row); err != nil {
+			return fmt.Errorf("error: %s", err)
+		}
+	}
+
+	if err := w.Error(); err != nil {
+		return fmt.Errorf("error: %s", err)
+	}
+	return nil
+}
+
+func WriteTeamJson(fileName string, schema []schema.Data) error {
+	file, err := os.OpenFile(fileName, os.O_CREATE, os.ModePerm)
+	if err != nil {
+		log.Printf("Failed to create file %s: %s", fileName, err)
+	}
+
+	defer file.Close()
+
+	enc := json.NewEncoder(file)
+	enc.SetIndent("", "    ")
+	if err := enc.Encode(schema); err != nil {
+		log.Printf("error: %s", err)
+	}
+
+	return nil
+}
+
+func WritePlayerCsv(fileName string, data []schema.Player) error {
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Printf("Failed to create file %s: %s", fileName, err)
+	}
+
+	w := csv.NewWriter(file)
+
+	enc := csvutil.NewEncoder(w)
+	defer w.Flush()
+
+	for _, row := range data {
+		if err := enc.Encode(row); err != nil {
+			return fmt.Errorf("error: %s", err)
+		}
+	}
+
+	if err := w.Error(); err != nil {
+		return fmt.Errorf("error: %s", err)
+	}
+	return nil
+}
+
+func WritePlayerJson(fileName string, schema []schema.Player) error {
+	file, err := os.OpenFile(fileName, os.O_CREATE, os.ModePerm)
+	if err != nil {
+		log.Printf("Failed to create file %s: %s", fileName, err)
+	}
+
+	defer file.Close()
+
+	enc := json.NewEncoder(file)
+	enc.SetIndent("", "    ")
+	if err := enc.Encode(schema); err != nil {
+		log.Printf("error: %s", err)
+	}
+
+	return nil
 }

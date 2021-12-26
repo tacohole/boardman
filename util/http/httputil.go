@@ -9,9 +9,10 @@ import (
 
 const (
 	BaseUrl     = "https://www.balldontlie.io/api/v1/"
-	Players     = "players"
-	Teams       = "teams"
-	Stats       = "stats"
+	Players     = "players/"
+	Teams       = "teams/"
+	Games       = "games/"
+	Stats       = "stats/"
 	httpTimeout = 30 * time.Second
 )
 
