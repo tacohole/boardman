@@ -31,6 +31,7 @@ func getGames(cmd *cobra.Command, args []string) {
 		if err != nil {
 			log.Fatalf("can't get games: %s", err)
 		}
+
 		// insert into database
 	}
 

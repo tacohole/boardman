@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -13,7 +14,7 @@ const (
 	ConfigFileNameNoExtension = "boardman-config"
 	ConfigFileName            = "boardman-config.json"
 	DbUrlEnvironmentName      = "DB_URL"
-	DbTimeout                 = "60 * time.Second"
+	DbTimeout                 = 60 * time.Second
 )
 
 type Configuration struct {
@@ -33,7 +34,7 @@ func getConfig() *Configuration {
 		log.Println("Unknown database URL")
 	}
 
-	config.DbTimeout = viper.GetDuration(DbTimeout)
+	config.DbTimeout = viper.GetDuration(fmt.Sprint(DbTimeout))
 	if config.DbTimeout == 0 {
 		log.Println("No database timeout set")
 	}

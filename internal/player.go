@@ -45,7 +45,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex < page.PageData.NextPageIndex; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(pageIndex)
+		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + "?page=" + fmt.Sprint(pageIndex)
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
 		if err != nil {
 			return nil, err
