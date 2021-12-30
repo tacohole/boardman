@@ -36,18 +36,15 @@ func getPlayers(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't get players: %s", err)
 	}
 
-	// insert into database
-	for _, player := range players {
-		result, err := insertPlayerRow(player)
-		if err != nil {
-			log.Printf("Could not insert player %d, %s", player.ID, err)
-		}
-		log.Printf("Inserted %s", fmt.Sprint(result))
+	result, err := insertPlayerRows(players)
+	if err != nil {
+		log.Printf("Could not perform insert:, %s", err)
 	}
+	log.Printf("Inserted %s", fmt.Sprint(result))
 
 }
 
-func insertPlayerRow(p schema.Player) (*sql.Result, error) {
+func insertPlayerRows(p []schema.Player) (*sql.Result, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
 		return nil, err
@@ -57,8 +54,13 @@ func insertPlayerRow(p schema.Player) (*sql.Result, error) {
 	defer cancel()
 
 	tx := db.MustBegin()
+	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, "INSERT INTO players (id,first_name,last_name,team) VALUES (:id,:first_name,:last_name,:team)", p)
+	result, err := tx.NamedExecContext(ctx, `INSERT INTO players (id, first_name, last_name, team) VALUES (:id,:first_name,:last_name,:team)`, p)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}

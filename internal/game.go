@@ -72,3 +72,25 @@ func (g *Game) CalculateWinnerAndMargin() {
 		g.Margin = g.HomeScore - g.VisitorScore
 	}
 }
+
+// "CREATE TABLE games(
+// 	game_id INT,
+// 	date DATE,
+// 	home_team_id INT,
+// 	visitor_team_id INT,
+// 	home_team_score INT,
+// 	visitor_team_score INT,
+// 	season INT,
+// 	winner_id INT,
+// 	margin INT,
+// 	is_postseason BOOL,
+// 	CONSTRAINT fk_teams
+// 	   FOREIGN KEY(home_team_id)
+// 	   REFERENCES teams(id),
+// 	CONSTRAINT fk_teams
+// 	   FOREIGN KEY(visitor_team_id)
+// 	   REFERENCES teams(id),
+// 	CONSTRAINT fk_teams
+// 	   FOREIGN KEY(winner_id)
+// 	   REFERENCES teams(id),
+// );"

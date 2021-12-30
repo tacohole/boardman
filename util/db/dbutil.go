@@ -19,6 +19,8 @@ func DbConn() (*sqlx.DB, error) {
 	return db, nil
 }
 
+// github.com/jackc/pgx/v4/pgxpool - look into connection pooling later
+
 // exec the schema or fail; multi-statement Exec behavior varies between
 // database drivers;  pq will exec them all, sqlite3 won't, ymmv
 
