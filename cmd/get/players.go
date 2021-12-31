@@ -7,7 +7,6 @@ import (
 	"log"
 
 	schema "github.com/tacohole/boardman/internal"
-	"github.com/tacohole/boardman/util/config"
 	dbutil "github.com/tacohole/boardman/util/db"
 
 	"github.com/spf13/cobra"
@@ -50,13 +49,28 @@ func insertPlayerRows(p []schema.Player) (*sql.Result, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), config.DbTimeout)
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO players (id, first_name, last_name, team) VALUES (:id,:first_name,:last_name,:team)`, p)
+	result, err := tx.NamedExecContext(ctx, `INSERT INTO players (
+		id, 
+		first_name, 
+		last_name, 
+		team, ) 
+		VALUES (
+			:id,
+			:first_name,
+			:last_name,
+			:team)`,
+		p)
 	if err != nil {
 		return nil, err
 	}

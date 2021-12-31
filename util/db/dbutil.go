@@ -3,6 +3,7 @@ package dbutil
 import (
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/jackc/pgx/v4"
 
@@ -17,6 +18,15 @@ func DbConn() (*sqlx.DB, error) {
 	}
 
 	return db, nil
+}
+
+func GenerateTimeout() (*time.Duration, error) {
+	timeout, err := time.ParseDuration(os.Getenv("DB_TIMEOUT"))
+	if err != nil {
+		return nil, err
+	}
+
+	return &timeout, nil
 }
 
 // github.com/jackc/pgx/v4/pgxpool - look into connection pooling later

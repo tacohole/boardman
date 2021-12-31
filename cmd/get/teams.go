@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	schema "github.com/tacohole/boardman/internal"
-	"github.com/tacohole/boardman/util/config"
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
@@ -49,12 +48,30 @@ func insertTeams(t []schema.Team) (*sql.Result, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), config.DbTimeout)
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
 	tx := db.MustBegin()
+	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, "INSERT INTO teams (id, name, abbrev, conference, division) VALUES (:id,:name,:abbrev,:conference,:division)", t)
+	result, err := tx.NamedExecContext(ctx, `INSERT INTO teams (
+		id, 
+		name, 
+		abbrev, 
+		conference, 
+		division) 
+		VALUES (
+			:id, 
+			:name,
+			:abbrev, 
+			:conference, 
+			:division)`,
+		t)
 	if err != nil {
 		return nil, err
 	}
