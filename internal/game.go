@@ -13,13 +13,15 @@ type Game struct {
 	ID           int        `json:"id"`
 	Date         *time.Time `json:"date"`
 	Home         Team       `json:"home_team"`
-	HomeScore    int        `json:"home_team_score"`
-	Visitor      Team       `json:"visitor_team"`
-	VisitorScore int        `json:"visitor_team_score"`
-	Season       Season     `json:"season"`
-	IsPostseason bool       `json:"postseason"`
-	Winner       Team       `json:"winner"`
-	Margin       int        `json:"margin"`
+	HomeID       int
+	HomeScore    int  `json:"home_team_score"`
+	Visitor      Team `json:"visitor_team"`
+	VisitorID    int
+	VisitorScore int    `json:"visitor_team_score"`
+	Season       Season `json:"season"`
+	IsPostseason bool   `json:"postseason"`
+	Winner       Team   `json:"winner"`
+	Margin       int    `json:"margin"`
 }
 
 // get all games for a season
@@ -48,9 +50,9 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 		for _, d := range page.Data {
 			g.ID = d.ID
 			g.Date = d.Date
-			g.Home = d.Home
+			g.HomeID = d.Home.ID
 			g.HomeScore = d.HomeScore
-			g.Visitor = d.Visitor
+			g.VisitorID = d.Visitor.ID
 			g.VisitorScore = d.VisitorScore
 			g.Season = d.Season
 			g.IsPostseason = d.IsPostseason
