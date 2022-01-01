@@ -13,7 +13,7 @@ import (
 )
 
 var getTeamsCmd = &cobra.Command{
-	Short: "test",
+	Short: "",
 	Long:  "",
 	Use:   "teams",
 	Run:   getTeamData,

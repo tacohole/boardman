@@ -63,15 +63,12 @@ func insertPlayerRows(p []schema.Player) (*sql.Result, error) {
 	defer tx.Rollback()
 
 	result, err := tx.NamedExecContext(ctx, `INSERT INTO players (
-		id, 
-		first_name, 
-		last_name, 
-		team, ) 
+		id, first_name, last_name, team_id )
 		VALUES (
 			:id,
 			:first_name,
 			:last_name,
-			:team)`,
+			:team_id)`,
 		p)
 	if err != nil {
 		return nil, err

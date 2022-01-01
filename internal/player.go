@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/google/uuid"
+
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 type Player struct {
-	ID            int    `json:"id"`
-	FirstName     string `json:"first_name"`
-	LastName      string `json:"last_name"`
-	CurrentTeamID int    `json:"team"`
+	ID            uuid.UUID `db:"id"`
+	BDL_ID        int       `json:"id" db:"balldontlie_id`
+	FirstName     string    `json:"first_name" db:"first_name"`
+	LastName      string    `json:"last_name" db:"last_name"`
+	CurrentTeamID int       `json:"team" db:"team_id"`
 }
 
 // get player by ID
@@ -45,7 +48,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + "/?page=" + fmt.Sprint(pageIndex)
+		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + "/?page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
 			return nil, err
@@ -62,9 +65,10 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			return nil, err
 		}
 		for _, d := range page.Data {
-			p.ID = d.ID
+			p.ID = uuid.New()
 			p.FirstName = d.FirstName
 			p.LastName = d.LastName
+			p.BDL_ID = d.ID
 			p.CurrentTeamID = d.CurrentTeam.ID
 			allPlayers = append(allPlayers, *p)
 		}
