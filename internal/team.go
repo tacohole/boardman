@@ -20,7 +20,7 @@ type Team struct {
 func (t *Team) GetTeamById() (*Team, error) {
 	getUrl := httpHelpers.BaseUrl + httpHelpers.Teams + fmt.Sprint(t.ID)
 
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
+	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (t *Team) GetAllTeams() ([]Team, error) {
 
 	getUrl := httpHelpers.BaseUrl + httpHelpers.Teams
 
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
+	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
 		return nil, err
 	}

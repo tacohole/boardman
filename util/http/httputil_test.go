@@ -10,7 +10,7 @@ const (
 )
 
 func TestMakeHttpRequest(t *testing.T) {
-	_, err := MakeHttpRequest(method, getUrl, nil, "")
+	_, err := MakeHttpRequest(method, getUrl)
 	if err != nil {
 		t.Fail()
 	}

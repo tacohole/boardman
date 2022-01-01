@@ -8,25 +8,22 @@ import (
 
 	"github.com/spf13/cobra"
 	schema "github.com/tacohole/boardman/internal"
-	"github.com/tacohole/boardman/util/config"
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
 var getGamesCmd = &cobra.Command{
 	Short: "",
 	Long:  "",
+	Use:   "games",
 	Run:   getGames,
 }
 
 func init() {
-	getGamesCmd.Flags().StringVar(&writeTo, "output", "", "output type, options are JSON or csv")
-
-	getGamesCmd.AddCommand(getPlayersCmd)
-
+	GetCmd.AddCommand(getGamesCmd)
 }
 
 func getGames(cmd *cobra.Command, args []string) {
-	loadDefaultVariables()
+	//loadDefaultVariables()
 
 	g := schema.Game{}
 	seasons := []int{1981: 2021}
@@ -52,7 +49,12 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), config.DbTimeout)
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
 	tx := db.MustBegin()
@@ -60,15 +62,15 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 
 	result, err := tx.NamedExecContext(ctx, `INSERT INTO games (
 		id, 
-			date,
-			home_id, 
-			home_team_score, 
-			visitor_id, 
-			visitor_team_score, 
-			season, 
-			postseason, 
-			winner, 
-			margin, 
+		date,
+		home_id, 
+		home_team_score, 
+		visitor_id, 
+		visitor_team_score, 
+		season, 
+		postseason, 
+		winner, 
+		margin, 
 	) VALUES (
 		:date,
 		:home_id, 

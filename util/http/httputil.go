@@ -1,39 +1,36 @@
 package httpHelpers
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"time"
 )
 
 const (
-	BaseUrl     = "https://www.balldontlie.io/api/v1/"
+	BaseUrl     = "https://balldontlie.io/api/v1/"
 	Players     = "players/"
-	Teams       = "teams/"
+	Teams       = "teams"
 	Games       = "games/"
 	Stats       = "stats/"
 	httpTimeout = 30 * time.Second
 )
 
-func MakeHttpRequest(method string, url string, data []byte, token string) (*http.Response, error) {
+func MakeHttpRequest(method string, url string) (*http.Response, error) {
 	client := http.Client{
 		Timeout: httpTimeout,
 	}
 
-	request, err := http.NewRequest("GET", url, bytes.NewBuffer(data))
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	request.Header.Set("Content Type", "application/json")
-	if token != "" {
-		request.Header.Set("Authorization", "Bearer"+token)
-	}
+	request.Header.Set("Content-Type", "application/json")
+	fmt.Printf("Sending request to %s", url)
 
 	response, err := client.Do(request)
-	if err != nil || response.StatusCode <= 400 {
-		return response, fmt.Errorf("%s request to %s failed with status %d", method, url, response.StatusCode)
+	if err != nil {
+		return nil, fmt.Errorf("%s request to %s failed: %s", method, url, err)
 	}
 	return response, nil
 }

@@ -15,18 +15,18 @@ import (
 var getPlayersCmd = &cobra.Command{
 	Short: "",
 	Long:  "",
+	Use:   "players",
 	Run:   getPlayers,
 }
 
 func init() {
-	getPlayersCmd.Flags().StringVar(&writeTo, "output", "", "output type, options are JSON or csv")
 
-	getCmd.AddCommand(getPlayersCmd)
+	GetCmd.AddCommand(getPlayersCmd)
 
 }
 
 func getPlayers(cmd *cobra.Command, args []string) {
-	loadDefaultVariables()
+	//loadDefaultVariables()
 
 	p := schema.Player{}
 

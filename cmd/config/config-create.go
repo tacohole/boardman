@@ -20,7 +20,6 @@ var generateConfigCmd = &cobra.Command{
 }
 
 func init() {
-	generateConfigCmd.Flags().StringVar(&logLevelConfig, "logLevel", "", "log verbosity")
 	generateConfigCmd.Flags().StringVar(&dbUrlConfig, "dbUrl", "", "connection string to your database")
 	generateConfigCmd.Flags().StringVar(&apiUrlConfig, "apiUrl", "", "API URL")
 
@@ -28,10 +27,6 @@ func init() {
 }
 
 func generateConfig(cmd *cobra.Command, args []string) {
-	logLevel, err := cmd.Flags().GetString(logLevelConfig)
-	if err != nil {
-		log.Fatalf("Could not read log level: %s", err)
-	}
 
 	dbUrl, err := cmd.Flags().GetString(dbUrlConfig)
 	if err != nil {
@@ -43,11 +38,11 @@ func generateConfig(cmd *cobra.Command, args []string) {
 		log.Fatalf("Could not read API URL: %s", err)
 	}
 
-	setConfigVars(logLevel, dbUrl, apiUrl)
+	setConfigVars(dbUrl, apiUrl)
 	writeConfig()
 }
 
-func setConfigVars(logLevel string, dbUrl string, apiUrl string) {
+func setConfigVars(dbUrl string, apiUrl string) {
 	var config *config.Configuration
 
 	if strings.TrimSpace(dbUrl) != "" {

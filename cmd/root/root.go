@@ -22,6 +22,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	genConfig "github.com/tacohole/boardman/cmd/config"
+	"github.com/tacohole/boardman/cmd/get"
 	"github.com/tacohole/boardman/util/config"
 
 	"github.com/spf13/viper"
@@ -55,6 +57,9 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", config.ConfigPath+config.ConfigFileName))
 	RootCmd.PersistentFlags().DurationVar(&dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, fmt.Sprintln("Include additional logging information"))
+
+	RootCmd.AddCommand(get.GetCmd)
+	RootCmd.AddCommand(genConfig.ConfigCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.

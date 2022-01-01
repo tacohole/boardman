@@ -12,16 +12,14 @@ import (
 )
 
 var getTeamsCmd = &cobra.Command{
-	Short: "",
+	Short: "test",
 	Long:  "",
+	Use:   "teams",
 	Run:   getTeamData,
 }
 
 func init() {
-	getTeamsCmd.Flags().StringVar(&writeTo, "output", "", "output type")
-
-	getTeamsCmd.MarkFlagRequired("writeTo")
-
+	GetCmd.AddCommand(getTeamsCmd)
 }
 
 func getTeamData(cmd *cobra.Command, args []string) {

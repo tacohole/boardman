@@ -32,7 +32,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 
 	for pageIndex := 0; pageIndex < page.PageData.NextPageIndex; pageIndex++ {
 		getUrl := httpHelpers.BaseUrl + httpHelpers.Games + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex)
-		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
+		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
 			return nil, err
 		}

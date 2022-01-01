@@ -14,6 +14,5 @@ var ConfigCmd = &cobra.Command{
 }
 
 // TODO config vars
-var logLevelConfig string
 var dbUrlConfig string
 var apiUrlConfig string

@@ -5,14 +5,14 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/jackc/pgx/v4"
+	_ "github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/jmoiron/sqlx"
 )
 
 func DbConn() (*sqlx.DB, error) {
 
-	db, err := sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
+	db, err := sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
