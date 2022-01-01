@@ -10,11 +10,11 @@ import (
 
 const (
 	// TODO config vars
-	ConfigPath                = "etc/boardman"
+	ConfigPath                = "/"
 	ConfigFileNameNoExtension = "boardman-config"
-	ConfigFileName            = "boardman-config.json"
-	DbUrlEnvironmentName      = "DB_URL"
-	DbTimeout                 = 60 * time.Second
+	ConfigFileName            = "boardman-config.env"
+	DbUrlEnvironmentName      = "DATABASE_URL"
+	DbTimeout                 = "DB_TIMEOUT"
 )
 
 type Configuration struct {
