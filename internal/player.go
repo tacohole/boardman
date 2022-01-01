@@ -12,7 +12,7 @@ import (
 
 type Player struct {
 	ID            uuid.UUID `db:"id"`
-	BDL_ID        int       `json:"id" db:"balldontlie_id`
+	BDL_ID        int       `json:"id" db:"balldontlie_id"`
 	FirstName     string    `json:"first_name" db:"first_name"`
 	LastName      string    `json:"last_name" db:"last_name"`
 	CurrentTeamID int       `json:"team" db:"team_id"`
