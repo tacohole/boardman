@@ -75,7 +75,7 @@ func (g *Game) CalculateWinnerAndMargin() {
 	}
 }
 
-// "CREATE TABLE games(
+// CREATE TABLE games(
 // 	game_id INT,
 // 	date DATE,
 // 	home_team_id INT,
@@ -89,10 +89,8 @@ func (g *Game) CalculateWinnerAndMargin() {
 // 	CONSTRAINT fk_teams
 // 	   FOREIGN KEY(home_team_id)
 // 	   REFERENCES teams(id),
-// 	CONSTRAINT fk_teams
 // 	   FOREIGN KEY(visitor_team_id)
 // 	   REFERENCES teams(id),
-// 	CONSTRAINT fk_teams
 // 	   FOREIGN KEY(winner_id)
-// 	   REFERENCES teams(id),
-// );"
+// 	   REFERENCES teams(id)
+// );

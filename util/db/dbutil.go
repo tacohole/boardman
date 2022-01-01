@@ -1,6 +1,7 @@
 package dbutil
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -11,17 +12,24 @@ import (
 )
 
 func DbConn() (*sqlx.DB, error) {
+	connString := os.Getenv("DATABASE_URL")
+	if connString == "" {
+		log.Fatalf("No database connection string provided")
+	}
 
-	db, err := sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
+	db, err := sqlx.Connect("pgx", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("Connected to Postgres")
 
 	return db, nil
 }
 
 func GenerateTimeout() (*time.Duration, error) {
-	timeout, err := time.ParseDuration(os.Getenv("DB_TIMEOUT"))
+	timeoutStr := os.Getenv("DB_TIMEOUT")
+
+	timeout, err := time.ParseDuration(timeoutStr)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	schema "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
@@ -23,7 +24,8 @@ func init() {
 }
 
 func getGames(cmd *cobra.Command, args []string) {
-	//loadDefaultVariables()
+	loadDefaultVariables()
+	godotenv.Load(".env")
 
 	g := schema.Game{}
 	seasons := []int{1981: 2021}

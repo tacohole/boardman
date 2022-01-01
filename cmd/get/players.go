@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/joho/godotenv"
 	schema "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
 
@@ -26,7 +27,8 @@ func init() {
 }
 
 func getPlayers(cmd *cobra.Command, args []string) {
-	//loadDefaultVariables()
+	loadDefaultVariables()
+	godotenv.Load(".env")
 
 	p := schema.Player{}
 

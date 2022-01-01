@@ -9,10 +9,10 @@ import (
 )
 
 type Player struct {
-	ID          int    `json:"id"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	CurrentTeam Team   `json:"team"`
+	ID            int    `json:"id"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
+	CurrentTeamID int    `json:"team"`
 }
 
 // get player by ID
@@ -44,8 +44,8 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 
 	var page Page
 
-	for pageIndex := 0; pageIndex < page.PageData.NextPageIndex; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + "?page=" + fmt.Sprint(pageIndex)
+	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
+		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + "/?page=" + fmt.Sprint(pageIndex)
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
 			return nil, err
@@ -65,7 +65,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			p.ID = d.ID
 			p.FirstName = d.FirstName
 			p.LastName = d.LastName
-			p.CurrentTeam = d.CurrentTeam
+			p.CurrentTeamID = d.CurrentTeam.ID
 			allPlayers = append(allPlayers, *p)
 		}
 	}

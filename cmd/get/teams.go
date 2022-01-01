@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	schema "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
@@ -24,6 +25,7 @@ func init() {
 
 func getTeamData(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
+	godotenv.Load(".env")
 
 	team := schema.Team{}
 
