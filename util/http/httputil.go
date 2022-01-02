@@ -10,8 +10,8 @@ const (
 	BaseUrl     = "https://balldontlie.io/api/v1/"
 	Players     = "players"
 	Teams       = "teams"
-	Games       = "games/"
-	Stats       = "stats/"
+	Games       = "games"
+	Stats       = "stats"
 	httpTimeout = 300 * time.Second
 )
 

@@ -2,6 +2,7 @@ package internal
 
 import "time"
 
+// PageData is page metadata for balldontlie API responses
 type PageData struct {
 	TotalPages    int `json:"total_pages"`
 	PageIndex     int `json:"current_page"`
@@ -10,11 +11,13 @@ type PageData struct {
 	ItemCount     int `json:"total_count"`
 }
 
+// Page is a page of response from balldontlie API
 type Page struct {
 	Data     []Data   `json:"data"`
 	PageData PageData `json:"meta"`
 }
 
+// Data contains all possible fields from balldontlie API endpoints
 type Data struct {
 	ID           int        `json:"id"`
 	Name         string     `json:"full_name"`
@@ -29,6 +32,6 @@ type Data struct {
 	HomeScore    int        `json:"home_team_score"`
 	Visitor      Team       `json:"visitor_team"`
 	VisitorScore int        `json:"visitor_team_score"`
-	Season       Season     `json:"season"`
+	LeagueYear   int        `json:"season"`
 	IsPostseason bool       `json:"postseason"`
 }

@@ -1,7 +1,7 @@
 package internal
 
 type Season struct {
-	LeagueYear string
+	LeagueYear int
 	Champion   Team
 	WConfChamp Team
 	EConfChamp Team

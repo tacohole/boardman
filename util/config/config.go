@@ -10,7 +10,7 @@ import (
 
 const (
 	// TODO config vars
-	ConfigPath                = "/"
+	ConfigPath                = "~/"
 	ConfigFileNameNoExtension = "boardman-config"
 	ConfigFileName            = "boardman-config.env"
 	DbUrlEnvironmentName      = "DATABASE_URL"
