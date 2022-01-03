@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/joho/godotenv"
-	schema "github.com/tacohole/boardman/internal"
+	internal "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
 
 	"github.com/spf13/cobra"
@@ -21,16 +20,18 @@ var getPlayersCmd = &cobra.Command{
 }
 
 func init() {
-
 	GetCmd.AddCommand(getPlayersCmd)
-
 }
 
 func getPlayers(cmd *cobra.Command, args []string) {
-	loadDefaultVariables()
-	godotenv.Load(".env")
+	// loadDefaultVariables()
 
-	p := schema.Player{}
+	err := preparePlayersSchema()
+	if err != nil {
+		log.Fatalf("can't create players schema: %s", err)
+	}
+
+	p := internal.Player{}
 
 	players, err := p.GetAllPlayers()
 	if err != nil {
@@ -45,7 +46,7 @@ func getPlayers(cmd *cobra.Command, args []string) {
 
 }
 
-func insertPlayerRows(p []schema.Player) (*sql.Result, error) {
+func insertPlayerRows(p []internal.Player) (*sql.Result, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
 		return nil, err
@@ -81,4 +82,34 @@ func insertPlayerRows(p []schema.Player) (*sql.Result, error) {
 
 	return &result, nil
 
+}
+
+func preparePlayersSchema() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	schema := `CREATE TABLE players(
+        uuid uuid PRIMARY KEY,
+ 		balldontlie_id INT,
+        first_name TEXT,
+		last_name TEXT,
+		current_team_id INT,
+        CONSTRAINT fk_teams
+           FOREIGN KEY(current_team_id)
+           REFERENCES teams(id)
+		); `
+
+	db.MustExecContext(ctx, schema)
+
+	return nil
 }
