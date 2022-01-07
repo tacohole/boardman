@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/google/uuid"
 	httpHelpers "github.com/tacohole/boardman/util/http"
@@ -59,7 +60,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 			g.CalculateWinnerAndMargin()
 			allGames = append(allGames, *g)
 		}
-
+		time.Sleep(1 * time.Second) // avoiding 429 from BDL
 	}
 	return allGames, nil
 }

@@ -33,6 +33,7 @@ type Data struct {
 	LeagueYear   int     `json:"season"`
 	IsPostseason bool    `json:"postseason"`
 	Minutes      string  `json:"avg_min" db:"avg_min"`
+	GamesPlayed  int     `json:"games_played"`
 	FGM          float32 `json:"fgm" db:"fgm"`
 	FGA          float32 `json:"fga" db:"fga"`
 	FG3M         float32 `json:"fg3m" db:"fg3m"`

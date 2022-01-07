@@ -25,22 +25,21 @@ func getGames(cmd *cobra.Command, args []string) {
 	// loadDefaultVariables()
 
 	g := schema.Game{}
-	seasons := []int{2020}
 
 	err := prepareSeasonSchema()
 	if err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 
-	for _, season := range seasons {
-		games, err := g.GetSeasonGames(season)
+	for i := 1979; i < 2021; i++ {
+		games, err := g.GetSeasonGames(i)
 		if err != nil {
 			log.Fatalf("can't get games: %s", err)
 		}
 
 		_, err = insertSeasonGames(games)
 		if err != nil {
-			log.Printf("can't insert games for season %d: %s", season, err)
+			log.Printf("can't insert games for season %d: %s", i, err)
 		}
 	}
 
