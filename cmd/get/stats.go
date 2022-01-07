@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+	schema "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
@@ -26,10 +27,22 @@ func getStats(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't create schema for stats: %s", err)
 	}
 
+	stats, err := getPlayerSeasonAverages(2021, 1)
+	if err != nil {
+		log.Printf("can't get stats for ")
+	}
+	err = insertPlayerSeasonAverages(stats)
+
 }
 
-func getPlayerStats() {
+func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 
+	return nil
+}
+
+func getPlayerSeasonAverages(season int, playerID int) (*schema.PlayerYear, error) {
+
+	return nil, nil
 }
 
 func prepareStatsSchema() error {

@@ -3,7 +3,6 @@ package get
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -26,7 +25,7 @@ func getGames(cmd *cobra.Command, args []string) {
 	// loadDefaultVariables()
 
 	g := schema.Game{}
-	seasons := []int{2021}
+	seasons := []int{2020}
 
 	err := prepareSeasonSchema()
 	if err != nil {
@@ -39,11 +38,10 @@ func getGames(cmd *cobra.Command, args []string) {
 			log.Fatalf("can't get games: %s", err)
 		}
 
-		result, err := insertSeasonGames(games)
+		_, err = insertSeasonGames(games)
 		if err != nil {
-			log.Printf("can't get games for season %d: %s", season, err)
+			log.Printf("can't insert games for season %d: %s", season, err)
 		}
-		log.Print(fmt.Sprint(result))
 	}
 
 }
@@ -91,6 +89,7 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 		:margin )`,
 		g)
 	if err != nil {
+		log.Printf("Insert failed, %s", result)
 		return nil, err
 	}
 	err = tx.Commit()
@@ -116,7 +115,7 @@ func prepareSeasonSchema() error {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	schema := `CREATE TABLE games(
+	schema := `CREATE TABLE IF NOT EXISTS games(
         uuid uuid PRIMARY KEY,
  		balldontlie_id INT,
         date DATE,

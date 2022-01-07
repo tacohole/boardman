@@ -22,7 +22,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	genConfig "github.com/tacohole/boardman/cmd/config"
-	"github.com/tacohole/boardman/cmd/get"
+	get "github.com/tacohole/boardman/cmd/get"
 )
 
 // var (

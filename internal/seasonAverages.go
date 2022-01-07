@@ -1,6 +1,11 @@
 package internal
 
-import "github.com/google/uuid"
+import (
+	"context"
+
+	"github.com/google/uuid"
+	dbutil "github.com/tacohole/boardman/util/db"
+)
 
 type PlayerYear struct {
 	PlayerID    uuid.UUID
@@ -27,3 +32,23 @@ type PlayerYear struct {
 }
 
 // lookup our UUID off BDL_ID
+func (py *PlayerYear) getUUIDFromBDLID() (*uuid.UUID, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	_, err = db.NamedExecContext(ctx, "SELECT id FROM players WHERE players(balldontlie_id)=:balldontlie_id", py)
+	if err != nil {
+		return nil, err
+	}
+
+	return &py.PlayerID, nil
+}

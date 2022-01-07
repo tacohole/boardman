@@ -23,8 +23,8 @@ type Player struct {
 }
 
 // get player by ID
-func (p *Player) GetPlayerById(id string) (*Player, error) {
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(p.ID)
+func GetPlayerById(id int) (*Player, error) {
+	getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(id)
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
@@ -36,13 +36,14 @@ func (p *Player) GetPlayerById(id string) (*Player, error) {
 	if err != nil {
 		return nil, err
 	}
+	p := Player{}
 
 	err = json.Unmarshal(r, &p)
 	if err != nil {
 		return nil, err
 	}
 
-	return p, nil
+	return &p, nil
 }
 
 // get all players

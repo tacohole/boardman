@@ -4,26 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/google/uuid"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 type Game struct {
-	ID           uuid.UUID  `db:"uuid"`
-	BDL_ID       int        `json:"id" db:"balldontlie_id"`
-	Date         *time.Time `json:"date" db:"date"`
-	Home         Team       `json:"home_team"`
-	HomeID       int        `db:"home_id"`
-	HomeScore    int        `json:"home_team_score" db:"home_score"`
-	Visitor      Team       `json:"visitor_team"`
-	VisitorID    int        `db:"visitor_id"`
-	VisitorScore int        `json:"visitor_team_score" db:"visitor_score"`
-	LeagueYear   int        `json:"season" db:"season"`
-	IsPostseason bool       `json:"postseason" db:"is_postseason"`
-	Winner       Team       `json:"winner" db:"winner_id"`
-	Margin       int        `json:"margin" db:"margin"`
+	ID           uuid.UUID `db:"uuid"`
+	BDL_ID       int       `json:"id" db:"balldontlie_id"`
+	Date         string    `json:"date" db:"date"`
+	HomeID       int       `db:"home_id"`
+	HomeScore    int       `json:"home_team_score" db:"home_score"`
+	VisitorID    int       `db:"visitor_id"`
+	VisitorScore int       `json:"visitor_team_score" db:"visitor_score"`
+	LeagueYear   int       `json:"season" db:"season"`
+	IsPostseason bool      `json:"postseason" db:"is_postseason"`
+	Winner       int       `json:"winner" db:"winner_id"`
+	Margin       int       `json:"margin" db:"margin"`
 }
 
 // get all games for a season
@@ -33,7 +30,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Games + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "per_page=100"
+		getUrl := httpHelpers.BaseUrl + httpHelpers.Games + "?seasons[]=" + fmt.Sprint(season) + "&amp;page=" + fmt.Sprint(pageIndex) + "per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
 			return nil, err
@@ -62,6 +59,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 			g.CalculateWinnerAndMargin()
 			allGames = append(allGames, *g)
 		}
+
 	}
 	return allGames, nil
 }
@@ -70,10 +68,10 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 func (g *Game) CalculateWinnerAndMargin() {
 
 	if g.HomeScore < g.VisitorScore {
-		g.Winner = g.Visitor
+		g.Winner = g.VisitorID
 		g.Margin = g.VisitorScore - g.HomeScore
 	} else {
-		g.Winner = g.Home
+		g.Winner = g.HomeID
 		g.Margin = g.HomeScore - g.VisitorScore
 	}
 }
