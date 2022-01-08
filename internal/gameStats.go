@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/google/uuid"
@@ -33,46 +34,58 @@ type SingleGame struct {
 	FT_PCT     float32   `json:"ft_pct" db:"ft_pct"`
 }
 
-func (s *SingleGame) GetAllGameStats() ([]SingleGame, error) {
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Stats + ""
-
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	r, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
+func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
+	var games []SingleGame // init return value
 	var page Page
-	var games []SingleGame
 
-	err = json.Unmarshal(r, &page)
+	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
+		getUrl := httpHelpers.BaseUrl + httpHelpers.Stats + "?seasons[]=" + fmt.Sprint(season)
 
-	for _, d := range page.Data {
-		s.AST = d.AST
-		s.BLK = d.BLK
-		s.DREB = d.DREB
-		s.FG3A = d.FG3A
-		s.FG3M = d.FG3M
-		s.FG3_PCT = d.FG3_PCT
-		s.FGA = d.FGA
-		s.FGM = d.FGM
-		s.FT_PCT = d.FT_PCT
-		s.GameID = LookupGameUUID()
-		s.Minutes = d.Minutes
-		s.OREB = d.OREB
-		s.PF = d.OREB
-		s.PF = d.PF
-		s.PTS = d.PTS
-		s.PlayerUUID = player.GetUUIDFromBDLID() // ?
-		s.REB = d.REB
-		s.STL = d.STL
-		s.TO = d.TO
-		s.TeamID = d.Team.ID
+		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		r, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(r, &page)
+
+		for _, d := range page.Data {
+			playerId, err := GetUUIDFromBDLID(d.Player.BDL_ID)
+			if err != nil {
+				return nil, err
+			}
+
+			gameId, err := GetUUIDFromBDLID(d.Game.BDL_ID)
+			if err != nil {
+				return nil, err
+			}
+
+			s.AST = d.AST
+			s.BLK = d.BLK
+			s.DREB = d.DREB
+			s.FG3A = d.FG3A
+			s.FG3M = d.FG3M
+			s.FG3_PCT = d.FG3_PCT
+			s.FGA = d.FGA
+			s.FGM = d.FGM
+			s.FT_PCT = d.FT_PCT
+			s.GameID = *gameId
+			s.Minutes = d.Minutes
+			s.OREB = d.OREB
+			s.PF = d.OREB
+			s.PF = d.PF
+			s.PTS = d.PTS
+			s.PlayerUUID = *playerId
+			s.REB = d.REB
+			s.STL = d.STL
+			s.TO = d.TO
+			s.TeamID = d.Team.ID
+		}
 	}
 
 	return games, nil

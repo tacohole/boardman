@@ -1,14 +1,12 @@
 package internal
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 
 	"github.com/google/uuid"
 
-	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
@@ -46,28 +44,6 @@ func GetPlayerById(id int) (*Player, error) {
 	}
 
 	return &p, nil
-}
-
-// lookup our UUID off BDL_ID
-func (p *Player) GetUUIDFromBDLID() (*uuid.UUID, error) {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return nil, err
-	}
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	_, err = db.NamedExecContext(ctx, `SELECT uuid FROM players WHERE players(balldontlie_id)=:balldontlie_id`, p)
-	if err != nil {
-		return nil, err
-	}
-
-	return &p.UUID, nil
 }
 
 // get all players

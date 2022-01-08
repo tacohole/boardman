@@ -1,5 +1,12 @@
 package internal
 
+import (
+	"context"
+
+	"github.com/google/uuid"
+	dbutil "github.com/tacohole/boardman/util/db"
+)
+
 // PageData is page metadata for balldontlie API responses
 type PageData struct {
 	TotalPages    int `json:"total_pages"`
@@ -33,7 +40,9 @@ type Data struct {
 	LeagueYear   int     `json:"season"`
 	IsPostseason bool    `json:"postseason"`
 	Minutes      string  `json:"avg_min" db:"avg_min"`
+	Game         Game    `json:"game"`
 	GamesPlayed  int     `json:"games_played"`
+	Player       Player  `json:"player"`
 	FGM          float32 `json:"fgm" db:"fgm"`
 	FGA          float32 `json:"fga" db:"fga"`
 	FG3M         float32 `json:"fg3m" db:"fg3m"`
@@ -50,4 +59,27 @@ type Data struct {
 	FG_PCT       float32 `json:"fg_pct" db:"fg_pct"`
 	FG3_PCT      float32 `json:"fg3_pct" db:"fg3_pct"`
 	FT_PCT       float32 `json:"ft_pct" db:"ft_pct"`
+}
+
+// lookup our UUID off BDL_ID
+func GetUUIDFromBDLID(bdlId int) (*uuid.UUID, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	var id uuid.UUID
+
+	if err := db.QueryRowContext(ctx, `SELECT uuid FROM players WHERE players(balldontlie_id)=:bdlId`, bdlId).Scan(&id); err != nil {
+		return nil, err
+	}
+
+	return &id, nil
 }
