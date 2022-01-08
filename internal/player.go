@@ -1,25 +1,27 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 
 	"github.com/google/uuid"
 
+	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 type Player struct {
-	UUID          uuid.UUID `db:"uuid"`
-	BDL_ID        int       `json:"id" db:"balldontlie_id"`
-	FirstName     string    `json:"first_name" db:"first_name"`
-	LastName      string    `json:"last_name" db:"last_name"`
-	Position      string    `json:"position" db:"position"`
-	HeightFt      int       `json: "height_feet" db:"height_feet"`
-	HeightIn      int       `json:"height_inches" db:"height_in"`
-	Weight        int       `json:"weight_pounds" db:"weight"`
-	CurrentTeamID int       `json:"team" db:"team_id"`
+	UUID      uuid.UUID `db:"uuid"`
+	BDL_ID    int       `json:"id" db:"balldontlie_id"`
+	FirstName string    `json:"first_name" db:"first_name"`
+	LastName  string    `json:"last_name" db:"last_name"`
+	Position  string    `json:"position" db:"position"`
+	HeightFt  int       `json: "height_feet" db:"height_feet"`
+	HeightIn  int       `json:"height_inches" db:"height_in"`
+	Weight    int       `json:"weight_pounds" db:"weight"`
+	TeamID    int       `json:"team" db:"team_id"`
 }
 
 // get player by ID
@@ -44,6 +46,28 @@ func GetPlayerById(id int) (*Player, error) {
 	}
 
 	return &p, nil
+}
+
+// lookup our UUID off BDL_ID
+func (p *Player) GetUUIDFromBDLID() (*uuid.UUID, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	_, err = db.NamedExecContext(ctx, `SELECT uuid FROM players WHERE players(balldontlie_id)=:balldontlie_id`, p)
+	if err != nil {
+		return nil, err
+	}
+
+	return &p.UUID, nil
 }
 
 // get all players
@@ -74,7 +98,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			p.FirstName = d.FirstName
 			p.LastName = d.LastName
 			p.BDL_ID = d.ID
-			p.CurrentTeamID = d.CurrentTeam.ID
+			p.TeamID = d.Team.ID
 			allPlayers = append(allPlayers, *p)
 		}
 	}

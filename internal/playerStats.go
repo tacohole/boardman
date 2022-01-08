@@ -31,29 +31,7 @@ type PlayerYear struct {
 	FT_PCT      float32   `json:"ft_pct" db:"ft_pct"`
 }
 
-// lookup our UUID off BDL_ID
-func (py *PlayerYear) getUUIDFromBDLID() (*uuid.UUID, error) {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return nil, err
-	}
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	_, err = db.NamedExecContext(ctx, `SELECT uuid FROM players WHERE players(balldontlie_id)=:balldontlie_id`, py)
-	if err != nil {
-		return nil, err
-	}
-
-	return &py.PlayerID, nil
-}
-
-func PrepareStatsSchema() error {
+func PreparePlayerStatsSchema() error {
 	schema := `CREATE TABLE player_season_avgs(
 		player_id UUID,
 		season INT,

@@ -24,7 +24,7 @@ type Data struct {
 	Division     string  `json:"division"`
 	FirstName    string  `json:"first_name"`
 	LastName     string  `json:"last_name"`
-	CurrentTeam  Team    `json:"team"`
+	Team         Team    `json:"team"`
 	Date         string  `json:"date"`
 	Home         Team    `json:"home_team"`
 	HomeScore    int     `json:"home_team_score"`

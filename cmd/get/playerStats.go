@@ -27,7 +27,7 @@ func init() {
 
 func getStats(cmd *cobra.Command, args []string) {
 
-	err := schema.PrepareStatsSchema()
+	err := schema.PreparePlayerStatsSchema()
 	if err != nil {
 		log.Fatalf("can't create schema for stats: %s", err)
 	}
@@ -42,6 +42,7 @@ func getStats(cmd *cobra.Command, args []string) {
 			stats, err := getPlayerSeasonAverages(i, player)
 			if err != nil {
 				log.Printf("can't get stats for %d", player.BDL_ID)
+				continue // don't insert
 			}
 			err = insertPlayerSeasonAverages(stats)
 			if err != nil {
