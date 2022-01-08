@@ -17,7 +17,7 @@ import (
 var getStatsCmd = &cobra.Command{
 	Short: "",
 	Long:  "",
-	Use:   "stats",
+	Use:   "player-stats",
 	Run:   getStats,
 }
 
@@ -27,7 +27,7 @@ func init() {
 
 func getStats(cmd *cobra.Command, args []string) {
 
-	err := prepareStatsSchema()
+	err := schema.PrepareStatsSchema()
 	if err != nil {
 		log.Fatalf("can't create schema for stats: %s", err)
 	}
@@ -70,37 +70,45 @@ func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 	defer tx.Rollback()
 
 	result, err := db.NamedExecContext(ctx, `INSERT INTO player_season_avgs (
-		player_id UUID,
-		season INT,
-		avg_min NUMERIC(4,2),
-		fgm NUMERIC(5,2),
-		fga NUMERIC(5,2),
-		fg3m NUMERIC(5,2),
-		fg3a NUMERIC(5,2),
-		oreb NUMERIC(5,2),
-		dreb NUMERIC(5,2),
-		reb NUMERIC(5,2),
-		ast NUMERIC(5,2),
-		stl NUMERIC(5,2),
-		blk NUMERIC(5,2),
-		to NUMERIC(5,2),
-		pf NUMERIC(4,2),
-		pts NUMERIC(5,2),
-		fg_pct NUMERIC(4,3),
-		fg3_pct NUMERIC(4,3),
-		ft_pct NUMERIC(4,3),
+		player_id,
+		league_year,
+		avg_min,
+		fgm,
+		fga,
+		fg3m,
+		fg3a,
+		oreb,
+		dreb,
+		reb,
+		ast,
+		stl,
+		blk,
+		to,
+		pf,
+		pts,
+		fg_pct,
+		fg3_pct,
+		ft_pct
 	) VALUES (
-		:uuid,
-		:balldontlie_id,
-		:date,
-		:home_id, 
-		:home_score, 
-		:visitor_id, 
-		:visitor_score, 
-		:season, 
-		:is_postseason, 
-		:winner_id, 
-		:margin )`,
+		:player_id,
+		:league_year,
+		:avg_min,
+		:fgm,
+		:fga,
+		:fg3m,
+		:fg3a,
+		:oreb,
+		:dreb,
+		:reb,
+		:ast,
+		:stl,
+		:blk,
+		:to,
+		:pf,
+		:pts,
+		:fg_pct,
+		:fg3_pct,
+		:ft_pct )`,
 		stats)
 	if err != nil {
 		log.Printf("Insert failed, %s", result)
@@ -135,7 +143,7 @@ func getPlayerSeasonAverages(season int, player schema.Player) (*schema.PlayerYe
 		return nil, err
 	}
 	for _, d := range page.Data {
-		playerYear.PlayerID = player.ID
+		playerYear.PlayerID = player.UUID
 		playerYear.LeagueYear = d.LeagueYear
 		playerYear.GamesPlayed = d.GamesPlayed
 		playerYear.Minutes = d.Minutes
@@ -190,48 +198,4 @@ func getPlayerIdCache() (*[]schema.Player, error) {
 	}
 
 	return &p, nil
-}
-
-func prepareStatsSchema() error {
-	schema := `CREATE TABLE player_season_avgs(
-		player_id UUID,
-		season INT,
-		avg_min NUMERIC(4,2),
-		fgm NUMERIC(5,2),
-		fga NUMERIC(5,2),
-		fg3m NUMERIC(5,2),
-		fg3a NUMERIC(5,2),
-		oreb NUMERIC(5,2),
-		dreb NUMERIC(5,2),
-		reb NUMERIC(5,2),
-		ast NUMERIC(5,2),
-		stl NUMERIC(5,2),
-		blk NUMERIC(5,2),
-		to NUMERIC(5,2),
-		pf NUMERIC(4,2),
-		pts NUMERIC(5,2),
-		fg_pct NUMERIC(4,3),
-		fg3_pct NUMERIC(4,3),
-		ft_pct NUMERIC(4,3),
-		CONSTRAINT fk_players
-		FOREIGN KEY(player_id)
-		REFERENCES players(uuid)
-	);`
-
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	db.MustExecContext(ctx, schema)
-
-	return nil
 }

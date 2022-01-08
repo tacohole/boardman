@@ -1,12 +1,14 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"time"
 
 	"github.com/google/uuid"
+	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
@@ -75,4 +77,44 @@ func (g *Game) CalculateWinnerAndMargin() {
 		g.Winner = g.HomeID
 		g.Margin = g.HomeScore - g.VisitorScore
 	}
+}
+
+func PrepareSeasonSchema() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	schema := `CREATE TABLE IF NOT EXISTS games(
+        uuid uuid PRIMARY KEY,
+ 		balldontlie_id INT,
+        date DATE,
+        home_id INT,
+        visitor_id INT,
+        home_score INT,
+        visitor_score INT,
+        season INT,
+        winner_id INT,
+        margin INT,
+        is_postseason BOOL,
+        CONSTRAINT fk_teams
+           FOREIGN KEY(home_id)
+           REFERENCES teams(id),
+           FOREIGN KEY(visitor_id)
+           REFERENCES teams(id),
+           FOREIGN KEY(winner_id)
+           REFERENCES teams(id)
+		); `
+
+	db.MustExecContext(ctx, schema)
+
+	return nil
 }

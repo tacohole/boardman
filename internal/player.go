@@ -11,7 +11,7 @@ import (
 )
 
 type Player struct {
-	ID            uuid.UUID `db:"id"`
+	UUID          uuid.UUID `db:"uuid"`
 	BDL_ID        int       `json:"id" db:"balldontlie_id"`
 	FirstName     string    `json:"first_name" db:"first_name"`
 	LastName      string    `json:"last_name" db:"last_name"`
@@ -70,7 +70,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			return nil, err
 		}
 		for _, d := range page.Data {
-			p.ID = uuid.New()
+			p.UUID = uuid.New()
 			p.FirstName = d.FirstName
 			p.LastName = d.LastName
 			p.BDL_ID = d.ID

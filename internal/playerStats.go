@@ -45,10 +45,54 @@ func (py *PlayerYear) getUUIDFromBDLID() (*uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	_, err = db.NamedExecContext(ctx, "SELECT id FROM players WHERE players(balldontlie_id)=:balldontlie_id", py)
+	_, err = db.NamedExecContext(ctx, `SELECT uuid FROM players WHERE players(balldontlie_id)=:balldontlie_id`, py)
 	if err != nil {
 		return nil, err
 	}
 
 	return &py.PlayerID, nil
+}
+
+func PrepareStatsSchema() error {
+	schema := `CREATE TABLE player_season_avgs(
+		player_id UUID,
+		season INT,
+		avg_min NUMERIC(4,2),
+		fgm NUMERIC(5,2),
+		fga NUMERIC(5,2),
+		fg3m NUMERIC(5,2),
+		fg3a NUMERIC(5,2),
+		oreb NUMERIC(5,2),
+		dreb NUMERIC(5,2),
+		reb NUMERIC(5,2),
+		ast NUMERIC(5,2),
+		stl NUMERIC(5,2),
+		blk NUMERIC(5,2),
+		to NUMERIC(5,2),
+		pf NUMERIC(4,2),
+		pts NUMERIC(5,2),
+		fg_pct NUMERIC(4,3),
+		fg3_pct NUMERIC(4,3),
+		ft_pct NUMERIC(4,3),
+		CONSTRAINT fk_players
+		FOREIGN KEY(player_id)
+		REFERENCES players(uuid)
+	);`
+
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	db.MustExecContext(ctx, schema)
+
+	return nil
 }

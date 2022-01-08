@@ -26,7 +26,7 @@ func getGames(cmd *cobra.Command, args []string) {
 
 	g := schema.Game{}
 
-	err := prepareSeasonSchema()
+	err := schema.PrepareSeasonSchema()
 	if err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
@@ -98,44 +98,4 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 
 	return &result, nil
 
-}
-
-func prepareSeasonSchema() error {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	schema := `CREATE TABLE IF NOT EXISTS games(
-        uuid uuid PRIMARY KEY,
- 		balldontlie_id INT,
-        date DATE,
-        home_id INT,
-        visitor_id INT,
-        home_score INT,
-        visitor_score INT,
-        season INT,
-        winner_id INT,
-        margin INT,
-        is_postseason BOOL,
-        CONSTRAINT fk_teams
-           FOREIGN KEY(home_id)
-           REFERENCES teams(id),
-           FOREIGN KEY(visitor_id)
-           REFERENCES teams(id),
-           FOREIGN KEY(winner_id)
-           REFERENCES teams(id)
-		); `
-
-	db.MustExecContext(ctx, schema)
-
-	return nil
 }
