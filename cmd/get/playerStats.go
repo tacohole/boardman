@@ -14,18 +14,18 @@ import (
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
-var getStatsCmd = &cobra.Command{
+var getPlayerStatsCmd = &cobra.Command{
 	Short: "",
 	Long:  "",
 	Use:   "player-stats",
-	Run:   getStats,
+	Run:   getPlayerStats,
 }
 
 func init() {
-	GetCmd.AddCommand(getStatsCmd)
+	GetCmd.AddCommand(getPlayerStatsCmd)
 }
 
-func getStats(cmd *cobra.Command, args []string) {
+func getPlayerStats(cmd *cobra.Command, args []string) {
 
 	err := schema.PreparePlayerStatsSchema()
 	if err != nil {
