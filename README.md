@@ -25,3 +25,21 @@
 
 #### get players
 `./boardman get players`
+
+#### get games
+`./boardman get games`
+
+#### get player season averages
+`./boardman get player-stats`
+
+#### get player single game stats
+`./boardman get game-stats`
+
+#### get coaches
+`./boardman get coaches`
+
+##### get champions and award winners
+`./boardman get champs`
+
+### get all
+`./boardman get paid`
