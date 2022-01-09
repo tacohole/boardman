@@ -15,4 +15,4 @@ var ConfigCmd = &cobra.Command{
 
 // TODO config vars
 var dbUrlConfig string
-var apiUrlConfig string
+var dbTimeOutConfig string

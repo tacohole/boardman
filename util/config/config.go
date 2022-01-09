@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"log"
-	"time"
 
 	"github.com/spf13/viper"
 )
@@ -19,7 +17,7 @@ const (
 
 type Configuration struct {
 	DbUrl     string
-	DbTimeout time.Duration
+	DbTimeout string
 }
 
 var config *Configuration
@@ -34,8 +32,8 @@ func getConfig() *Configuration {
 		log.Println("Unknown database URL")
 	}
 
-	config.DbTimeout = viper.GetDuration(fmt.Sprint(DbTimeout))
-	if config.DbTimeout == 0 {
+	config.DbTimeout = viper.GetString(DbTimeout)
+	if config.DbTimeout == "" {
 		log.Println("No database timeout set")
 	}
 

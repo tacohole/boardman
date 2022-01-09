@@ -10,7 +10,7 @@ var getCoachesCmd = &cobra.Command{
 }
 
 func getCoaches(cmd *cobra.Command, args []string) {
-	// get endpoint
+	// get endpoint http://data.nba.net/prod/v1/{year}/coaches.json
 	// make structs in internal
 	//
 }
