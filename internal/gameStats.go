@@ -39,7 +39,7 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Stats + "?seasons[]=" + fmt.Sprint(season)
+		getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season)
 
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {

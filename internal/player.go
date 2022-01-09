@@ -24,7 +24,7 @@ type Player struct {
 
 // get player by ID
 func GetPlayerById(id int) (*Player, error) {
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Players + fmt.Sprint(id)
+	getUrl := BDLUrl + BDLPlayers + fmt.Sprint(id)
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
@@ -53,7 +53,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Players + "/?page=" + fmt.Sprint(pageIndex) + "&per_page=100"
+		getUrl := BDLUrl + BDLPlayers + "/?page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
 			return nil, err

@@ -7,6 +7,14 @@ import (
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
+const (
+	BDLUrl     = "https://balldontlie.io/api/v1/"
+	BDLPlayers = "players"
+	BDLTeams   = "teams"
+	BDLGames   = "games"
+	BDLStats   = "stats"
+)
+
 // PageData is page metadata for balldontlie API responses
 type PageData struct {
 	TotalPages    int `json:"total_pages"`

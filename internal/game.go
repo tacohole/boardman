@@ -33,7 +33,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := httpHelpers.BaseUrl + httpHelpers.Games + "?seasons[]=" + fmt.Sprint(season) + "&amp;page=" + fmt.Sprint(pageIndex) + "per_page=100"
+		getUrl := BDLUrl + BDLGames + "?seasons[]=" + fmt.Sprint(season) + "&amp;page=" + fmt.Sprint(pageIndex) + "per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
 			return nil, err

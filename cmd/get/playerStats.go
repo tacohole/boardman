@@ -124,7 +124,7 @@ func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 }
 
 func getPlayerSeasonAverages(season int, player schema.Player) (*schema.PlayerYear, error) {
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Stats + "?seasons[]=" + fmt.Sprint(season) + "&player_ids[]=" + fmt.Sprint(player.BDL_ID)
+	getUrl := schema.BDLUrl + schema.BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&player_ids[]=" + fmt.Sprint(player.BDL_ID)
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
 		return nil, err
