@@ -1,10 +1,10 @@
 # boardman gets paid
 
-## building a dataset of NBA team/player stats from [balldontlie.io](https://www.balldontlie.io/)
+## building a dataset of NBA team/player stats from [balldontlie.io](https://www.balldontlie.io/) and [data.nba.com](https://data.nba.com/)
 
 ## Pre-Reqs
-- go v1.17
-- PostgreSQL
+- go >=v1.14
+- PostgreSQL >=v13
 
 ## Install and Run
 ### local installation
@@ -17,8 +17,12 @@
 - add your database URL as "DATABASE_URL=postgresql://user:secret@host:port/database_name"
 - set your database timeout as "DB_TIMEOUT=30s" (accepts ms/s/m/h)
 
-### compile and run
+### compile
 `go build -o boardman`
+
+### what it does:
+each command creates the relevant relations in Posgres
+and populates tables with data
 
 #### get teams
 `./boardman get teams`
@@ -41,5 +45,7 @@
 ##### get champions and award winners
 `./boardman get champs`
 
-### get all
+#### get all
 `./boardman get paid`
+
+shout out to [nbasense.com](http://nbasense.com/) for NBA API documentation
