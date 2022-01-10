@@ -37,7 +37,12 @@ func getTeamData(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't get teams: %s", err)
 	}
 
-	result, err := insertTeams(teams)
+	nbaIds, err := internal.GetNbaIds(teams)
+	if err != nil {
+		log.Fatalf("can't get NBA teamIDs: %s", err)
+	}
+
+	result, err := insertTeams(nbaIds)
 	if err != nil {
 		log.Printf("Error inserting team: %s", err)
 	}
