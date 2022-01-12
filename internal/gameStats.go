@@ -84,7 +84,7 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 			s.REB = d.REB
 			s.STL = d.STL
 			s.TO = d.TO
-			s.TeamID = d.Team.ID
+			s.TeamID = d.Team.BDL_ID
 		}
 	}
 

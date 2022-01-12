@@ -74,7 +74,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			p.FirstName = d.FirstName
 			p.LastName = d.LastName
 			p.BDL_ID = d.ID
-			p.TeamID = d.Team.ID
+			p.TeamID = d.Team.BDL_ID
 			allPlayers = append(allPlayers, *p)
 		}
 	}

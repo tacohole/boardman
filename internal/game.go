@@ -53,9 +53,9 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 			g.ID = uuid.New()
 			g.BDL_ID = d.ID
 			g.Date = d.Date
-			g.HomeID = d.Home.ID
+			g.HomeID = d.Home.BDL_ID
 			g.HomeScore = d.HomeScore
-			g.VisitorID = d.Visitor.ID
+			g.VisitorID = d.Visitor.BDL_ID
 			g.VisitorScore = d.VisitorScore
 			g.LeagueYear = d.LeagueYear
 			g.IsPostseason = d.IsPostseason
