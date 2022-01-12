@@ -10,7 +10,12 @@ const (
 
 // structs
 type NbaPage struct {
-	Data []struct{} `json:"standard"`
+	Internal []struct{} `json:"internal"`
+	League   NbaLeague  `json:"league"`
+}
+
+type NbaLeague struct {
+	Standard []TeamResponse `json:"standard"`
 }
 
 // we really just want the teamID and name here

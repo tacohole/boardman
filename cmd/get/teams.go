@@ -37,12 +37,17 @@ func getTeamData(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't get teams: %s", err)
 	}
 
-	nbaIds, err := internal.GetNbaIds(teams)
+	nbaIds, err := internal.GetNbaIds()
 	if err != nil {
 		log.Fatalf("can't get NBA teamIDs: %s", err)
 	}
 
-	result, err := insertTeams(nbaIds)
+	addIds, err := internal.AddNbaIds(*nbaIds, teams)
+	if err != nil {
+		log.Fatalf("can't add NBA ids to teams: %s", err)
+	}
+
+	result, err := insertTeams(*addIds)
 	if err != nil {
 		log.Printf("Error inserting team: %s", err)
 	}
@@ -68,13 +73,17 @@ func insertTeams(t []internal.Team) (*sql.Result, error) {
 	defer tx.Rollback()
 
 	result, err := tx.NamedExecContext(ctx, `INSERT INTO teams (
-		id, 
+		uuid,
+		balldontlie_id,
+		nba_id,
 		name, 
 		abbrev, 
 		conference, 
 		division) 
 		VALUES (
-			:id, 
+			:uuid,
+			:balldontlie_id,
+			:nba_id, 
 			:name,
 			:abbrev, 
 			:conference, 
@@ -106,6 +115,7 @@ func prepareTeamsSchema() error {
 	schema := `CREATE TABLE teams(
         uuid uuid PRIMARY KEY,
  		balldontlie_id INT,
+		nba_id TEXT,
         name TEXT,
 		abbrev TEXT,
 		conference TEXT,

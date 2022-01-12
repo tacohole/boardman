@@ -11,13 +11,13 @@ import (
 )
 
 type Team struct {
-	UUID       uuid.UUID `json:"uuid", db:"uuid"`
-	BDL_ID     int       `json:"id", db:"balldontlie_id"`
-	NBA_ID     string    `json:"teamId", db:"nba_id"`
-	Name       string    `json:"full_name", db:"name"`
-	Abbrev     string    `json:"abbreviation", db:"abbrev"`
-	Conference string    `json:"conference", db:"conference"`
-	Division   string    `json:"division", db:"division"`
+	UUID       uuid.UUID `db:"uuid"`
+	BDL_ID     int       `json:"id" db:"balldontlie_id"`
+	NBA_ID     string    `json:"teamId" db:"nba_id"`
+	Name       string    `json:"full_name" db:"name"`
+	Abbrev     string    `json:"abbreviation" db:"abbrev"`
+	Conference string    `json:"conference" db:"conference"`
+	Division   string    `json:"division" db:"division"`
 }
 
 // get team by ID
@@ -78,7 +78,7 @@ func (t *Team) GetAllTeams() ([]Team, error) {
 	return allTeams, nil
 }
 
-func GetNbaIds(teams []Team) ([]Team, error) {
+func GetNbaIds() (*[]TeamResponse, error) {
 	getUrl := NbaDataUrl + fmt.Sprint(2021) + Teams
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
@@ -88,20 +88,36 @@ func GetNbaIds(teams []Team) ([]Team, error) {
 	defer resp.Body.Close()
 
 	r, err := ioutil.ReadAll(resp.Body)
-
-	var tr []TeamResponse
-	err = json.Unmarshal(r, &tr)
-
-	for _, team := range teams {
-		for _, t := range tr {
-			if team.Name == t.Name {
-				team.NBA_ID = t.ID
-			}
-		}
-
+	if err != nil {
+		return nil, err
 	}
 
-	return teams, nil
+	var page NbaPage
+	var teams []TeamResponse
+	var t TeamResponse
+	if err = json.Unmarshal(r, &page); err != nil {
+		return nil, err
+	}
+
+	for _, item := range page.League.Standard {
+		t.ID = item.ID
+		t.Name = item.Name
+		teams = append(teams, t)
+	}
+
+	return &teams, nil
+}
+
+func AddNbaIds(ids []TeamResponse, teams []Team) (*[]Team, error) {
+	for _, team := range teams {
+		for _, id := range ids {
+			if team.Name == id.Name {
+				team.NBA_ID = id.ID
+			}
+		}
+	}
+
+	return &teams, nil
 }
 
 // // get all teams in conf - move to Presti, can't query this endpoint
