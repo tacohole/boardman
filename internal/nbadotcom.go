@@ -20,8 +20,9 @@ type NbaLeague struct {
 
 // we really just want the teamID and name here
 type TeamResponse struct {
-	Name string `json:"fullName"`
-	ID   string `json:"teamId"`
+	Name   string `json:"fullName"`
+	ID     string `json:"teamId"`
+	Abbrev string `json:"tricode"`
 }
 
 type CoachResponse struct {

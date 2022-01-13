@@ -78,7 +78,7 @@ func (t *Team) GetAllTeams() ([]Team, error) {
 	return allTeams, nil
 }
 
-func GetNbaIds() (*[]TeamResponse, error) {
+func GetNbaIds() ([]TeamResponse, error) {
 	getUrl := NbaDataUrl + fmt.Sprint(2021) + Teams
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
@@ -102,22 +102,32 @@ func GetNbaIds() (*[]TeamResponse, error) {
 	for _, item := range page.League.Standard {
 		t.ID = item.ID
 		t.Name = item.Name
+		t.Abbrev = item.Abbrev
 		teams = append(teams, t)
 	}
 
-	return &teams, nil
+	return teams, nil
 }
 
-func AddNbaIds(ids []TeamResponse, teams []Team) (*[]Team, error) {
-	for _, team := range teams {
-		for _, id := range ids {
-			if team.Name == id.Name {
-				team.NBA_ID = id.ID
-			}
-		}
+// not working still
+func AddNbaIds(ids []TeamResponse, teams []Team) ([]Team, error) {
+	// make map
+	idMap := make(map[string]string)
+
+	for _, id := range ids {
+		idMap[id.Abbrev] = id.ID
 	}
 
-	return &teams, nil
+	for _, team := range teams {
+		for k, v := range idMap {
+			if team.Abbrev == idMap[k] {
+				team.NBA_ID = idMap[v]
+			}
+		}
+
+	}
+
+	return teams, nil
 }
 
 // // get all teams in conf - move to Presti, can't query this endpoint
