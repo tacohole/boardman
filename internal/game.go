@@ -62,7 +62,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 			g.CalculateWinnerAndMargin()
 			allGames = append(allGames, *g)
 		}
-		time.Sleep(1 * time.Second) // avoiding 429 from BDL
+		time.Sleep(2000 * time.Millisecond) // avoiding 429 from BDL
 	}
 	return allGames, nil
 }
@@ -93,7 +93,7 @@ func PrepareSeasonSchema() error {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	schema := `CREATE TABLE IF NOT EXISTS games(
+	schema := `CREATE TABLE games(
         uuid uuid PRIMARY KEY,
  		balldontlie_id INT,
         date DATE,
@@ -107,11 +107,11 @@ func PrepareSeasonSchema() error {
         is_postseason BOOL,
         CONSTRAINT fk_teams
            FOREIGN KEY(home_id)
-           REFERENCES teams(id),
+           REFERENCES teams(balldontlie_id),
            FOREIGN KEY(visitor_id)
-           REFERENCES teams(id),
+           REFERENCES teams(balldontlie_id),
            FOREIGN KEY(winner_id)
-           REFERENCES teams(id)
+           REFERENCES teams(balldontlie_id)
 		); `
 
 	db.MustExecContext(ctx, schema)

@@ -44,12 +44,13 @@ func getCoaches(cmd *cobra.Command, args []string) {
 				log.Print(err)
 			}
 			coach.TeamID = *teamUUID
-			log.Printf("%s", coach.TeamID)
 			coachesWithIds = append(coachesWithIds, coach)
 		}
 
 		if err = insertCoaches(coachesWithIds); err != nil {
-			log.Fatalf("can't insert coaches for season %d: %s", i, err)
+			log.Printf("can't insert coaches for season %d: %s", i, err)
+		} else {
+			log.Printf("inserted %d coaches", len(coachesWithIds))
 		}
 	}
 
@@ -121,7 +122,7 @@ func prepareCoachesSchema() error {
  		first_name TEXT,
 		last_name TEXT,
 		is_assistant BOOL,
-		team_id uuid,
+		team_id UUID,
 		season INT,
 		nba_team_id TEXT,
 		nba_id TEXT,

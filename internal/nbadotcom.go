@@ -4,7 +4,6 @@ package internal
 const (
 	NbaDataUrl = "http://data.nba.net/prod/v1/"
 	Coaches    = "/coaches.json"
-	Champs     = "/playoffsBracket.json"
 	Teams      = "/teams.json"
 )
 

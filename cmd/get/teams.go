@@ -2,8 +2,6 @@ package get
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -51,23 +49,21 @@ func getTeamData(cmd *cobra.Command, args []string) {
 		teamsWithIds = append(teamsWithIds, team)
 	}
 
-	result, err := insertTeams(teamsWithIds)
-	if err != nil {
+	if err = insertTeams(teamsWithIds); err != nil {
 		log.Printf("Error inserting team: %s", err)
 	}
-	log.Printf("Inserted %s", fmt.Sprint(result))
 
 }
 
-func insertTeams(t []internal.Team) (*sql.Result, error) {
+func insertTeams(t []internal.Team) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -76,7 +72,7 @@ func insertTeams(t []internal.Team) (*sql.Result, error) {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO teams (
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO teams (
 		uuid,
 		balldontlie_id,
 		nba_id,
@@ -94,11 +90,11 @@ func insertTeams(t []internal.Team) (*sql.Result, error) {
 			:division)`,
 		t)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	tx.Commit()
 
-	return &result, nil
+	return nil
 
 }
 
@@ -118,7 +114,7 @@ func prepareTeamsSchema() error {
 
 	schema := `CREATE TABLE teams(
         uuid uuid PRIMARY KEY,
- 		balldontlie_id INT,
+ 		balldontlie_id INT UNIQUE,
 		nba_id TEXT,
         name TEXT,
 		abbrev TEXT,

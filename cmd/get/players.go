@@ -2,8 +2,6 @@ package get
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"log"
 
 	internal "github.com/tacohole/boardman/internal"
@@ -38,23 +36,22 @@ func getPlayers(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't get players: %s", err)
 	}
 
-	result, err := insertPlayerRows(players)
-	if err != nil {
+	if err := insertPlayerRows(players); err != nil {
 		log.Printf("Could not perform insert:, %s", err)
 	}
-	log.Printf("Inserted %s", fmt.Sprint(result))
+	log.Printf("Inserted %d players", len(players))
 
 }
 
-func insertPlayerRows(p []internal.Player) (*sql.Result, error) {
+func insertPlayerRows(p []internal.Player) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -63,8 +60,12 @@ func insertPlayerRows(p []internal.Player) (*sql.Result, error) {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO players (
-		uuid, first_name, last_name, balldontlie_id, team_id )
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO players (
+		uuid,
+		first_name,
+		last_name,
+		balldontlie_id, 
+		team_id )
 		VALUES (
 			:uuid,
 			:first_name,
@@ -73,14 +74,14 @@ func insertPlayerRows(p []internal.Player) (*sql.Result, error) {
 			:team_id)`,
 		p)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	err = tx.Commit()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &result, nil
+	return nil
 
 }
 
@@ -103,11 +104,11 @@ func preparePlayersSchema() error {
  		balldontlie_id INT,
         first_name TEXT,
 		last_name TEXT,
-		current_team_id INT,
+		team_id uuid,
         CONSTRAINT fk_teams
-           FOREIGN KEY(current_team_id)
-           REFERENCES teams(id)
-		); `
+        FOREIGN KEY(team_id)
+        REFERENCES teams(uuid)
+		);`
 
 	db.MustExecContext(ctx, schema)
 
