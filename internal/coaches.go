@@ -1,11 +1,13 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
 	"github.com/google/uuid"
+	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
@@ -50,4 +52,42 @@ func GetSeasonCoaches(season int) ([]Coach, error) {
 		coaches = append(coaches, c)
 	}
 	return coaches, nil
+}
+
+func AddTeamUUID(teams []Team, coach Coach) (*uuid.UUID, error) {
+
+	for j := 0; j < len(teams); j++ {
+		if coach.NBA_TeamID == teams[j].NBA_ID {
+			return &teams[j].UUID, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no team UUID for coach %s", coach.NBA_ID)
+}
+
+func GetTeamCache() ([]Team, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	q := `SELECT * FROM teams`
+	dest := &[]Team{}
+
+	if err = tx.SelectContext(ctx, dest, q); err != nil {
+		return nil, err
+	}
+
+	return *dest, nil
 }
