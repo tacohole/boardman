@@ -23,7 +23,7 @@ type PlayerYear struct {
 	AST         float32   `json:"ast" db:"ast"`
 	STL         float32   `json:"stl" db:"stl"`
 	BLK         float32   `json:"blk" db:"blk"`
-	TO          float32   `json:"to" db:"to"`
+	TO          float32   `json:"to" db:"turnovers"`
 	PF          float32   `json:"pf" db:"pf"`
 	PTS         float32   `json:"pts" db:"pts"`
 	FG_PCT      float32   `json:"fg_pct" db:"fg_pct"`
@@ -46,7 +46,7 @@ func PreparePlayerStatsSchema() error {
 		ast NUMERIC(5,2),
 		stl NUMERIC(5,2),
 		blk NUMERIC(5,2),
-		to NUMERIC(5,2),
+		turnovers NUMERIC(5,2),
 		pf NUMERIC(4,2),
 		pts NUMERIC(5,2),
 		fg_pct NUMERIC(4,3),
@@ -54,8 +54,7 @@ func PreparePlayerStatsSchema() error {
 		ft_pct NUMERIC(4,3),
 		CONSTRAINT fk_players
 		FOREIGN KEY(player_id)
-		REFERENCES players(uuid)
-	);`
+		REFERENCES players(uuid));`
 
 	db, err := dbutil.DbConn()
 	if err != nil {

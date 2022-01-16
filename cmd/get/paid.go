@@ -20,9 +20,8 @@ func getPaid(cmd *cobra.Command, args []string) {
 	// loadDefaultVariables()
 	getTeamData(getTeamsCmd, []string{})
 	getPlayers(getPlayersCmd, []string{})
+	getCoaches(getCoachesCmd, []string{})
 	getGames(getGamesCmd, []string{})
 	getGameStats(getGameStatsCmd, []string{})
 	getPlayerStats(getPlayerStatsCmd, []string{})
-	getCoaches(getCoachesCmd, []string{})
-	getAwardWinners(getAwardWinnersCmd, []string{})
 }
