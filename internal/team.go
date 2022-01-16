@@ -78,7 +78,7 @@ func (t *Team) GetAllTeams() ([]Team, error) {
 	return allTeams, nil
 }
 
-func GetNbaIds() ([]TeamResponse, error) {
+func GetNbaIds() ([]NbaData, error) {
 	getUrl := NbaDataUrl + fmt.Sprint(2021) + Teams
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
@@ -93,14 +93,14 @@ func GetNbaIds() ([]TeamResponse, error) {
 	}
 
 	var page NbaPage
-	var teams []TeamResponse
-	var t TeamResponse
+	var teams []NbaData
+	var t NbaData
 	if err = json.Unmarshal(r, &page); err != nil {
 		return nil, err
 	}
 
 	for _, item := range page.League.Standard {
-		t.ID = item.ID
+		t.TeamID = item.TeamID
 		t.Name = item.Name
 		t.Abbrev = item.Abbrev
 		teams = append(teams, t)
@@ -108,11 +108,11 @@ func GetNbaIds() ([]TeamResponse, error) {
 	return teams, nil
 }
 
-func AddNbaId(ids []TeamResponse, team Team) (string, error) {
+func AddNbaId(ids []NbaData, team Team) (string, error) {
 
 	for j := 0; j < len(ids); j++ {
 		if team.Abbrev == ids[j].Abbrev {
-			return ids[j].ID, nil
+			return ids[j].TeamID, nil
 		}
 	}
 

@@ -10,28 +10,20 @@ const (
 
 // structs
 type NbaPage struct {
-	Internal []struct{} `json:"internal"`
+	Internal []struct{} `json:"internal"` // we don't care about this
 	League   NbaLeague  `json:"league"`
 }
 
 type NbaLeague struct {
-	Standard []TeamResponse `json:"standard"`
+	Standard []NbaData `json:"standard"`
 }
 
-// we really just want the teamID and name here
-type TeamResponse struct {
-	Name   string `json:"fullName"`
-	ID     string `json:"teamId"`
-	Abbrev string `json:"tricode"`
-}
-
-type CoachResponse struct {
+type NbaData struct {
+	Name        string `json:"fullName"`
+	Abbrev      string `json:"tricode"`
 	FirstName   string `json:"firstName"`
 	LastName    string `json:"lastName"`
 	IsAssistant bool   `json:"isAssistant"`
 	PersonID    string `json:"personId"`
 	TeamID      string `json:"teamId"`
-}
-
-type ChampResponse struct {
 }

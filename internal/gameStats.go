@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/google/uuid"
 	dbutil "github.com/tacohole/boardman/util/db"
@@ -52,7 +53,9 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 			return nil, err
 		}
 
-		err = json.Unmarshal(r, &page)
+		if err = json.Unmarshal(r, &page); err != nil {
+			log.Fatal(err)
+		}
 
 		for _, d := range page.Data {
 			playerId, err := GetUUIDFromBDLID(d.Player.BDL_ID)
