@@ -41,13 +41,17 @@ func getTeamData(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("can't get NBA teamIDs: %s", err)
 	}
+	teamsWithIds := []internal.Team{}
 
-	addIds, err := internal.AddNbaIds(nbaIds, teams)
-	if err != nil {
-		log.Fatalf("can't add NBA ids to teams: %s", err)
+	for _, team := range teams {
+		team.NBA_ID, err = internal.AddNbaId(nbaIds, team)
+		if err != nil {
+			log.Fatalf("can't add NBA ids to teams: %s", err)
+		}
+		teamsWithIds = append(teamsWithIds, team)
 	}
 
-	result, err := insertTeams(addIds)
+	result, err := insertTeams(teamsWithIds)
 	if err != nil {
 		log.Printf("Error inserting team: %s", err)
 	}
@@ -83,7 +87,7 @@ func insertTeams(t []internal.Team) (*sql.Result, error) {
 		VALUES (
 			:uuid,
 			:balldontlie_id,
-			:nba_id, 
+			:nba_id,
 			:name,
 			:abbrev, 
 			:conference, 

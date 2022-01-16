@@ -12,12 +12,12 @@ import (
 
 type Team struct {
 	UUID       uuid.UUID `db:"uuid"`
-	BDL_ID     int       `json:"id" db:"balldontlie_id"`
-	NBA_ID     string    `json:"teamId" db:"nba_id"`
-	Name       string    `json:"full_name" db:"name"`
-	Abbrev     string    `json:"abbreviation" db:"abbrev"`
-	Conference string    `json:"conference" db:"conference"`
-	Division   string    `json:"division" db:"division"`
+	BDL_ID     int       `db:"balldontlie_id"`
+	NBA_ID     string    `db:"nba_id"`
+	Name       string    `db:"name"`
+	Abbrev     string    `db:"abbrev"`
+	Conference string    `db:"conference"`
+	Division   string    `db:"division"`
 }
 
 // get team by ID
@@ -105,29 +105,18 @@ func GetNbaIds() ([]TeamResponse, error) {
 		t.Abbrev = item.Abbrev
 		teams = append(teams, t)
 	}
-
 	return teams, nil
 }
 
-// not working still
-func AddNbaIds(ids []TeamResponse, teams []Team) ([]Team, error) {
-	// make map
-	idMap := make(map[string]string)
+func AddNbaId(ids []TeamResponse, team Team) (string, error) {
 
-	for _, id := range ids {
-		idMap[id.Abbrev] = id.ID
-	}
-
-	for _, team := range teams {
-		for k, v := range idMap {
-			if team.Abbrev == idMap[k] {
-				team.NBA_ID = idMap[v]
-			}
+	for j := 0; j < len(ids); j++ {
+		if team.Abbrev == ids[j].Abbrev {
+			return ids[j].ID, nil
 		}
-
 	}
 
-	return teams, nil
+	return "", fmt.Errorf("no NBA ID for team %s", team.Name)
 }
 
 // // get all teams in conf - move to Presti, can't query this endpoint
