@@ -36,6 +36,8 @@ func getCoaches(cmd *cobra.Command, args []string) {
 			log.Fatalf("can't get coaches for season %d: %s", i, err)
 		}
 
+		coachesWithIds := []internal.Coach{}
+
 		for _, coach := range coaches {
 			teamUUID, err := internal.AddTeamUUID(teamCache, coach)
 			if err != nil {
@@ -43,9 +45,10 @@ func getCoaches(cmd *cobra.Command, args []string) {
 			}
 			coach.TeamID = *teamUUID
 			log.Printf("%s", coach.TeamID)
+			coachesWithIds = append(coachesWithIds, coach)
 		}
 
-		if err = insertCoaches(coaches); err != nil {
+		if err = insertCoaches(coachesWithIds); err != nil {
 			log.Fatalf("can't insert coaches for season %d: %s", i, err)
 		}
 	}
@@ -76,6 +79,7 @@ func insertCoaches(c []internal.Coach) error {
 		is_assistant, 
 		nba_id,
 		team_id,
+		season,
 		nba_team_id 
 	) VALUES (
 		:uuid,
@@ -84,6 +88,7 @@ func insertCoaches(c []internal.Coach) error {
 		:is_assistant, 
 		:nba_id,
 		:team_id,
+		:season,
 		:nba_team_id )`,
 		c)
 	if err != nil {
@@ -116,13 +121,13 @@ func prepareCoachesSchema() error {
  		first_name TEXT,
 		last_name TEXT,
 		is_assistant BOOL,
-		team_id UUID,
+		team_id uuid,
+		season INT,
 		nba_team_id TEXT,
 		nba_id TEXT,
 		CONSTRAINT fk_teams
 		FOREIGN KEY(team_id)
-		REFERENCES teams(uuid)
-		);`
+		REFERENCES teams(uuid));`
 
 	db.MustExecContext(ctx, schema)
 

@@ -17,6 +17,7 @@ type Coach struct {
 	LastName    string    `db:"last_name"`
 	IsAssistant bool      `db:"is_assistant"`
 	TeamID      uuid.UUID `db:"team_id"`
+	Season      int       `db:"season"`
 	NBA_TeamID  string    `db:"nba_team_id"`
 	NBA_ID      string    `db:"nba_id"`
 }
@@ -47,8 +48,13 @@ func GetSeasonCoaches(season int) ([]Coach, error) {
 		c.FirstName = item.FirstName
 		c.LastName = item.LastName
 		c.IsAssistant = item.IsAssistant
+		// problem specific to the data from this endpoint: isAssistant is reversed for a few older years
+		if season <= 2017 {
+			c.IsAssistant = !c.IsAssistant
+		}
 		c.NBA_ID = item.PersonID
 		c.NBA_TeamID = item.TeamID
+		c.Season = season
 		coaches = append(coaches, c)
 	}
 	return coaches, nil
