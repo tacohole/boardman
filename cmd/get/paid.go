@@ -25,5 +25,4 @@ func getPaid(cmd *cobra.Command, args []string) {
 	getPlayerStats(getPlayerStatsCmd, []string{})
 	getCoaches(getCoachesCmd, []string{})
 	getAwardWinners(getAwardWinnersCmd, []string{})
-
 }
