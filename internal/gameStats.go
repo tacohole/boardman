@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"time"
 
 	"github.com/google/uuid"
 	dbutil "github.com/tacohole/boardman/util/db"
@@ -39,55 +38,53 @@ type SingleGame struct {
 	FT_PCT       float32   `json:"ft_pct" db:"ft_pct"`
 }
 
-func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
-	var games []SingleGame // init return value
+func GetGameStatsPage(season int, pageIndex int) ([]SingleGame, error) {
+	var s SingleGame
+	var games []SingleGame // return value
 	var page Page
 
-	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
+	getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 
-		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
+	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
-		r, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
+	r, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
-		if err = json.Unmarshal(r, &page); err != nil {
-			return nil, err
-		}
+	if err = json.Unmarshal(r, &page); err != nil {
+		return nil, err
+	}
 
-		for _, d := range page.Data {
-			s.UUID = uuid.New()
-			s.BDL_ID = d.ID
-			s.PlayerBDL_ID = d.Player.BDL_ID
-			s.TeamBDL_ID = d.Team.BDL_ID
-			s.AST = d.AST
-			s.BLK = d.BLK
-			s.DREB = d.DREB
-			s.FG3A = d.FG3A
-			s.FG3M = d.FG3M
-			s.FG3_PCT = d.FG3_PCT
-			s.FGA = d.FGA
-			s.FGM = d.FGM
-			s.FT_PCT = d.FT_PCT
-			// s.GameID = *gameId insert later
-			s.Minutes = d.Minutes
-			s.OREB = d.OREB
-			s.PF = d.OREB
-			s.PF = d.PF
-			s.PTS = d.PTS
-			// s.PlayerUUID = *playerId insert later
-			s.REB = d.REB
-			s.STL = d.STL
-			s.TO = d.TO
-			games = append(games, *s)
-		}
-		time.Sleep(1000 * time.Millisecond) // more 429 dodging
+	for _, d := range page.Data {
+		s.UUID = uuid.New()
+		s.BDL_ID = d.ID
+		s.PlayerBDL_ID = d.Player.BDL_ID
+		s.TeamBDL_ID = d.Team.BDL_ID
+		s.AST = d.AST
+		s.BLK = d.BLK
+		s.DREB = d.DREB
+		s.FG3A = d.FG3A
+		s.FG3M = d.FG3M
+		s.FG3_PCT = d.FG3_PCT
+		s.FGA = d.FGA
+		s.FGM = d.FGM
+		s.FT_PCT = d.FT_PCT
+		// s.GameID = *gameId insert later
+		s.Minutes = d.Minutes
+		s.OREB = d.OREB
+		s.PF = d.OREB
+		s.PF = d.PF
+		s.PTS = d.PTS
+		// s.PlayerUUID = *playerId insert later
+		s.REB = d.REB
+		s.STL = d.STL
+		s.TO = d.TO
+		games = append(games, s)
 	}
 
 	return games, nil
@@ -102,23 +99,23 @@ func PrepareGameStatsSchema() error {
 		game_uuid UUID,
 		team_uuid UUID,
 		team_bdl_id INT,
-		min NUMERIC(4,2),
-		fgm NUMERIC(5,2),
-		fga NUMERIC(5,2),
-		fg3m NUMERIC(5,2),
-		fg3a NUMERIC(5,2),
-		oreb NUMERIC(5,2),
-		dreb NUMERIC(5,2),
-		reb NUMERIC(5,2),
-		ast NUMERIC(5,2),
-		stl NUMERIC(5,2),
-		blk NUMERIC(5,2),
-		turnovers NUMERIC(5,2),
-		pf NUMERIC(4,2),
-		pts NUMERIC(5,2),
-		fg_pct NUMERIC(4,3),
-		fg3_pct NUMERIC(4,3),
-		ft_pct NUMERIC(4,3),
+		min TEXT,
+		fgm NUMERIC,
+		fga NUMERIC,
+		fg3m NUMERIC,
+		fg3a NUMERIC,
+		oreb NUMERIC,
+		dreb NUMERIC,
+		reb NUMERIC,
+		ast NUMERIC,
+		stl NUMERIC,
+		blk NUMERIC,
+		turnovers NUMERIC,
+		pf NUMERIC,
+		pts NUMERIC,
+		fg_pct NUMERIC,
+		fg3_pct NUMERIC,
+		ft_pct NUMERIC,
 		CONSTRAINT fk_players
 		FOREIGN KEY(player_uuid)
 		REFERENCES players(uuid),

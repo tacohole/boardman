@@ -3,6 +3,7 @@ package get
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/spf13/cobra"
 	internal "github.com/tacohole/boardman/internal"
@@ -24,22 +25,27 @@ func init() {
 func getGameStats(cmd *cobra.Command, args []string) {
 	// loadDefaultVariables()
 
-	s := internal.SingleGame{}
-
 	err := internal.PrepareGameStatsSchema()
 	if err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 
-	for i := 1979; i < 2021; i++ {
-		games, err := s.GetAllGameStats(i)
-		if err != nil {
-			log.Fatalf("can't get games: %s", err)
+	for i := 2020; i <= 2021; i++ {
+		var page internal.Page
+
+		for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
+			gameSlice, err := internal.GetGameStatsPage(i, pageIndex)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+
+			if err = insertGameStats(gameSlice); err != nil {
+				log.Fatalf("can't insert games for season %d: %s", i, err)
+			}
+
+			time.Sleep(1000 * time.Millisecond) // more 429 dodging
 		}
 
-		if err = insertGameStats(games); err != nil {
-			log.Fatalf("can't insert games for season %d: %s", i, err)
-		}
 	}
 
 	// add our UUIDs to new table
@@ -148,15 +154,12 @@ func updateGamesWithPlayerIds() error {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	stmt := `UPDATE player_game_stats
-			SET player_game_stats.player_uuid
+	stmt := `UPDATE player_game_stats 
+			SET player_uuid = players.uuid
 			FROM players
-			WHERE player_game_status.player_bdl_id = players.balldontlie_id`
+			WHERE player_game_stats.player_bdl_id = players.balldontlie_id;`
 
-	_, err = tx.NamedExecContext(ctx, stmt, nil)
-	if err != nil {
-		return err
-	}
+	tx.MustExecContext(ctx, stmt)
 
 	return nil
 }
@@ -179,14 +182,11 @@ func updateGamesWithGameIds() error {
 	defer tx.Rollback()
 
 	stmt := `UPDATE player_game_stats
-			SET player_game_stats.balldontlie_id
+			SET game_uuid = games.uuid
 			FROM games
-			WHERE player_game_status.balldontlie_id = games.balldontlie_id`
+			WHERE player_game_stats.balldontlie_id = games.balldontlie_id;`
 
-	_, err = tx.NamedExecContext(ctx, stmt, nil)
-	if err != nil {
-		return err
-	}
+	tx.MustExecContext(ctx, stmt)
 
 	return nil
 }
@@ -208,15 +208,12 @@ func updateGamesWithTeamIds() error {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	stmt := `UPDATE player_game_stats
-			SET player_game_stats.team_uuid
-			FROM teams
-			WHERE player_game_status.team_bdl_id = teams.balldontlie_id`
+	stmt := `UPDATE player_game_stats 
+			SET team_uuid = teams.uuid
+			FROM teams 
+			WHERE player_game_stats.team_bdl_id = teams.balldontlie_id;`
 
-	_, err = tx.NamedExecContext(ctx, stmt, nil)
-	if err != nil {
-		return err
-	}
+	tx.MustExecContext(ctx, stmt)
 
 	return nil
 }
