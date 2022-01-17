@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -45,7 +44,7 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 	var page Page
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-		getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season)
+		getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
@@ -59,7 +58,7 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 		}
 
 		if err = json.Unmarshal(r, &page); err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
 		for _, d := range page.Data {
@@ -86,6 +85,7 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 			s.REB = d.REB
 			s.STL = d.STL
 			s.TO = d.TO
+			games = append(games, *s)
 		}
 		time.Sleep(1000 * time.Millisecond) // more 429 dodging
 	}

@@ -2,7 +2,6 @@ package get
 
 import (
 	"context"
-	"database/sql"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -37,23 +36,22 @@ func getGames(cmd *cobra.Command, args []string) {
 			log.Fatalf("can't get games: %s", err)
 		}
 
-		_, err = insertSeasonGames(games)
-		if err != nil {
+		if err = insertSeasonGames(games); err != nil {
 			log.Printf("can't insert games for season %d: %s", i, err)
 		}
 	}
 
 }
 
-func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
+func insertSeasonGames(g []schema.Game) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -62,7 +60,7 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO games (
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO games (
 		uuid,
 		balldontlie_id,
 		date,
@@ -88,14 +86,13 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 		:margin )`,
 		g)
 	if err != nil {
-		log.Printf("Insert failed, %s", result)
-		return nil, err
+		return err
 	}
 	err = tx.Commit()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &result, nil
+	return nil
 
 }

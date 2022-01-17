@@ -37,9 +37,8 @@ func getGameStats(cmd *cobra.Command, args []string) {
 			log.Fatalf("can't get games: %s", err)
 		}
 
-		err = insertGameStats(games)
-		if err != nil {
-			log.Printf("can't insert games for season %d: %s", i, err)
+		if err = insertGameStats(games); err != nil {
+			log.Fatalf("can't insert games for season %d: %s", i, err)
 		}
 	}
 
@@ -75,7 +74,7 @@ func insertGameStats(stats []internal.SingleGame) error {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := db.NamedExecContext(ctx, `INSERT INTO player_game_stats (
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO player_game_stats (
 		uuid,
 		balldontlie_id,
 		player_bdl_id,
@@ -96,8 +95,8 @@ func insertGameStats(stats []internal.SingleGame) error {
 		pts,
 		fg_pct,
 		fg3_pct,
-		ft_pct,
-	) VALUES (
+		ft_pct) 
+		VALUES(
 		:uuid,
 		:balldontlie_id,
 		:player_bdl_id,
@@ -118,12 +117,12 @@ func insertGameStats(stats []internal.SingleGame) error {
 		:pts,
 		:fg_pct,
 		:fg3_pct,
-		:ft_pct, )`,
+		:ft_pct)`,
 		stats)
 	if err != nil {
-		log.Printf("Insert failed, %s", result)
 		return err
 	}
+
 	err = tx.Commit()
 	if err != nil {
 		return err
