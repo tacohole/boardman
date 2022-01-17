@@ -43,6 +43,19 @@ func getGameStats(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	// add our UUIDs to new table
+	if err = updateGamesWithPlayerIds(); err != nil {
+		log.Fatalf("can't add player UUIDs to player_game_stats: %s", err)
+	}
+
+	if err = updateGamesWithTeamIds(); err != nil {
+		log.Fatalf("can't add team UUIDs to player_game_stats: %s", err)
+	}
+
+	if err = updateGamesWithGameIds(); err != nil {
+		log.Fatalf("can't add game UUIDs to player_game_stats: %s", err)
+	}
+
 }
 
 func insertGameStats(stats []internal.SingleGame) error {
@@ -63,9 +76,10 @@ func insertGameStats(stats []internal.SingleGame) error {
 	defer tx.Rollback()
 
 	result, err := db.NamedExecContext(ctx, `INSERT INTO player_game_stats (
-		player_uuid,
-		game_uuid,
-		team_id,
+		uuid,
+		balldontlie_id,
+		player_bdl_id,
+		team_bdl_id,
 		min,
 		fgm,
 		fga,
@@ -77,16 +91,17 @@ func insertGameStats(stats []internal.SingleGame) error {
 		ast,
 		stl,
 		blk,
-		to,
+		turnovers,
 		pf,
 		pts,
 		fg_pct,
 		fg3_pct,
 		ft_pct,
 	) VALUES (
-		:player_uuid,
-		:game_uuid,
-		:team_id,
+		:uuid,
+		:balldontlie_id,
+		:player_bdl_id,
+		:team_bdl_id,
 		:min,
 		:fgm,
 		:fga,
@@ -98,7 +113,7 @@ func insertGameStats(stats []internal.SingleGame) error {
 		:ast,
 		:stl,
 		:blk,
-		:to,
+		:turnovers,
 		:pf,
 		:pts,
 		:fg_pct,
@@ -110,6 +125,96 @@ func insertGameStats(stats []internal.SingleGame) error {
 		return err
 	}
 	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func updateGamesWithPlayerIds() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	stmt := `UPDATE player_game_stats
+			SET player_game_stats.player_uuid
+			FROM players
+			WHERE player_game_status.player_bdl_id = players.balldontlie_id`
+
+	_, err = tx.NamedExecContext(ctx, stmt, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func updateGamesWithGameIds() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	stmt := `UPDATE player_game_stats
+			SET player_game_stats.balldontlie_id
+			FROM games
+			WHERE player_game_status.balldontlie_id = games.balldontlie_id`
+
+	_, err = tx.NamedExecContext(ctx, stmt, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func updateGamesWithTeamIds() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	stmt := `UPDATE player_game_stats
+			SET player_game_stats.team_uuid
+			FROM teams
+			WHERE player_game_status.team_bdl_id = teams.balldontlie_id`
+
+	_, err = tx.NamedExecContext(ctx, stmt, nil)
 	if err != nil {
 		return err
 	}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	dbutil "github.com/tacohole/boardman/util/db"
@@ -13,26 +14,30 @@ import (
 )
 
 type SingleGame struct {
-	PlayerUUID uuid.UUID `db:"player_uuid"`
-	GameID     uuid.UUID `db:"game_uuid"`
-	TeamID     int       `db:"team_id"`
-	Minutes    string    `json:"min" db:"min"`
-	FGM        float32   `json:"fgm" db:"fgm"`
-	FGA        float32   `json:"fga" db:"fga"`
-	FG3M       float32   `json:"fg3m" db:"fg3m"`
-	FG3A       float32   `json:"fg3a" db:"fg3a"`
-	OREB       float32   `json:"oreb" db:"oreb"`
-	DREB       float32   `json:"dreb" db:"dreb"`
-	REB        float32   `json:"reb" db:"reb"`
-	AST        float32   `json:"ast" db:"ast"`
-	STL        float32   `json:"stl" db:"stl"`
-	BLK        float32   `json:"blk" db:"blk"`
-	TO         float32   `json:"turnover" db:"to"`
-	PF         float32   `json:"pf" db:"pf"`
-	PTS        float32   `json:"pts" db:"pts"`
-	FG_PCT     float32   `json:"fg_pct" db:"fg_pct"`
-	FG3_PCT    float32   `json:"fg3_pct" db:"fg3_pct"`
-	FT_PCT     float32   `json:"ft_pct" db:"ft_pct"`
+	UUID         uuid.UUID `db:"uuid"`
+	PlayerUUID   uuid.UUID `db:"player_uuid"`
+	PlayerBDL_ID int       `db:"player_bdl_id"`
+	GameID       uuid.UUID `db:"game_uuid"`
+	BDL_ID       int       `json:"id" db:"balldontlie_id"`
+	TeamUUID     uuid.UUID `db:"team_uuid"`
+	TeamBDL_ID   int       `db:"team_bdl_id"`
+	Minutes      string    `json:"min" db:"min"`
+	FGM          float32   `json:"fgm" db:"fgm"`
+	FGA          float32   `json:"fga" db:"fga"`
+	FG3M         float32   `json:"fg3m" db:"fg3m"`
+	FG3A         float32   `json:"fg3a" db:"fg3a"`
+	OREB         float32   `json:"oreb" db:"oreb"`
+	DREB         float32   `json:"dreb" db:"dreb"`
+	REB          float32   `json:"reb" db:"reb"`
+	AST          float32   `json:"ast" db:"ast"`
+	STL          float32   `json:"stl" db:"stl"`
+	BLK          float32   `json:"blk" db:"blk"`
+	TO           float32   `json:"turnover" db:"turnovers"`
+	PF           float32   `json:"pf" db:"pf"`
+	PTS          float32   `json:"pts" db:"pts"`
+	FG_PCT       float32   `json:"fg_pct" db:"fg_pct"`
+	FG3_PCT      float32   `json:"fg3_pct" db:"fg3_pct"`
+	FT_PCT       float32   `json:"ft_pct" db:"ft_pct"`
 }
 
 func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
@@ -58,16 +63,10 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 		}
 
 		for _, d := range page.Data {
-			playerId, err := GetUUIDFromBDLID(d.Player.BDL_ID) // doesn't work
-			if err != nil {
-				return nil, err
-			}
-
-			gameId, err := GetUUIDFromBDLID(d.Game.BDL_ID)
-			if err != nil {
-				return nil, err
-			}
-
+			s.UUID = uuid.New()
+			s.BDL_ID = d.ID
+			s.PlayerBDL_ID = d.Player.BDL_ID
+			s.TeamBDL_ID = d.Team.BDL_ID
 			s.AST = d.AST
 			s.BLK = d.BLK
 			s.DREB = d.DREB
@@ -77,18 +76,18 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 			s.FGA = d.FGA
 			s.FGM = d.FGM
 			s.FT_PCT = d.FT_PCT
-			s.GameID = *gameId
+			// s.GameID = *gameId insert later
 			s.Minutes = d.Minutes
 			s.OREB = d.OREB
 			s.PF = d.OREB
 			s.PF = d.PF
 			s.PTS = d.PTS
-			s.PlayerUUID = *playerId
+			// s.PlayerUUID = *playerId insert later
 			s.REB = d.REB
 			s.STL = d.STL
 			s.TO = d.TO
-			s.TeamID = d.Team.BDL_ID
 		}
+		time.Sleep(1000 * time.Millisecond) // more 429 dodging
 	}
 
 	return games, nil
@@ -96,9 +95,13 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 
 func PrepareGameStatsSchema() error {
 	schema := `CREATE TABLE player_game_stats(
+		uuid UUID PRIMARY KEY,
+		balldontlie_id INT,
 		player_uuid UUID,
+		player_bdl_id INT,
 		game_uuid UUID,
-		team_id INT,
+		team_uuid UUID,
+		team_bdl_id INT,
 		min NUMERIC(4,2),
 		fgm NUMERIC(5,2),
 		fga NUMERIC(5,2),
@@ -110,7 +113,7 @@ func PrepareGameStatsSchema() error {
 		ast NUMERIC(5,2),
 		stl NUMERIC(5,2),
 		blk NUMERIC(5,2),
-		to NUMERIC(5,2),
+		turnovers NUMERIC(5,2),
 		pf NUMERIC(4,2),
 		pts NUMERIC(5,2),
 		fg_pct NUMERIC(4,3),
@@ -119,6 +122,9 @@ func PrepareGameStatsSchema() error {
 		CONSTRAINT fk_players
 		FOREIGN KEY(player_uuid)
 		REFERENCES players(uuid),
+		CONSTRAINT fk_teams
+		FOREIGN KEY(team_uuid)
+		REFERENCES teams(uuid),
 		CONSTRAINT fk_games
 		FOREIGN KEY(game_uuid)
 		REFERENCES games(uuid)

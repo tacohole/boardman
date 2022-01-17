@@ -46,7 +46,7 @@ func getPlayerStats(cmd *cobra.Command, args []string) {
 			}
 			err = insertPlayerSeasonAverages(stats)
 			if err != nil {
-				log.Printf("could not insert stats for %d", player.BDL_ID)
+				log.Fatalf("could not insert stats for %d", player.BDL_ID)
 			}
 		}
 	}
