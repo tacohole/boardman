@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-	schema "github.com/tacohole/boardman/internal"
+	internal "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
@@ -18,15 +18,15 @@ var getGameStatsCmd = &cobra.Command{
 }
 
 func init() {
-	GetCmd.AddCommand(getGamesCmd)
+	GetCmd.AddCommand(getGameStatsCmd)
 }
 
 func getGameStats(cmd *cobra.Command, args []string) {
 	// loadDefaultVariables()
 
-	s := schema.SingleGame{}
+	s := internal.SingleGame{}
 
-	err := schema.PrepareSeasonSchema()
+	err := internal.PrepareGameStatsSchema()
 	if err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
@@ -45,7 +45,7 @@ func getGameStats(cmd *cobra.Command, args []string) {
 
 }
 
-func insertGameStats(stats []schema.SingleGame) error {
+func insertGameStats(stats []internal.SingleGame) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
 		return err

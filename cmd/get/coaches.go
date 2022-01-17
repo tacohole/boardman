@@ -39,7 +39,7 @@ func getCoaches(cmd *cobra.Command, args []string) {
 		coachesWithIds := []internal.Coach{}
 
 		for _, coach := range coaches {
-			teamUUID, err := internal.AddTeamUUID(teamCache, coach)
+			teamUUID, err := internal.AddCoachTeamUUID(teamCache, coach)
 			if err != nil {
 				log.Print(err)
 			}

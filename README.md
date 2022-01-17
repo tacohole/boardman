@@ -7,15 +7,18 @@
 - PostgreSQL >=v13
 
 ## Install and Run
+
 ### local installation
-`mkdir boardman`
-`cd boardman`
-`gh repo clone tacohole/boardman`
+```
+mkdir boardman
+cd boardman
+gh repo clone tacohole/boardman
+```
 
 ### configuration
 `cat boardman-config.env`
-- add your database URL as "DATABASE_URL=postgresql://user:secret@host:port/database_name"
-- set your database timeout as "DB_TIMEOUT=30s" (accepts ms/s/m/h)
+- add your database URL as `DATABASE_URL=postgresql://user:secret@host:port/database_name`
+- set your database timeout as `DB_TIMEOUT=30s` (accepts ms/s/m/h)
 
 ### compile
 `go build -o boardman`
@@ -30,6 +33,9 @@ and populates tables with data
 #### get players
 `./boardman get players`
 
+#### get coaches
+`./boardman get coaches`
+
 #### get games
 `./boardman get games`
 
@@ -38,12 +44,6 @@ and populates tables with data
 
 #### get player single game stats
 `./boardman get game-stats`
-
-#### get coaches
-`./boardman get coaches`
-
-##### get champions and award winners
-`./boardman get champs`
 
 #### get all
 `./boardman get paid`

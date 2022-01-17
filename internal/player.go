@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -77,6 +78,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			p.TeamID = d.Team.BDL_ID
 			allPlayers = append(allPlayers, *p)
 		}
+		time.Sleep(1000 * time.Millisecond)
 	}
 	return allPlayers, nil
 }

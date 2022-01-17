@@ -85,7 +85,7 @@ func GetUUIDFromBDLID(bdlId int) (*uuid.UUID, error) {
 
 	var id uuid.UUID
 
-	if err := db.QueryRowContext(ctx, `SELECT uuid FROM players WHERE players(balldontlie_id)=:bdlId`, bdlId).Scan(&id); err != nil {
+	if err := db.QueryRowContext(ctx, `SELECT uuid FROM players WHERE players.balldontlie_id=$1`, bdlId).Scan(&id); err != nil {
 		return nil, err
 	}
 

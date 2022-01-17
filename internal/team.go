@@ -1,21 +1,23 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 
 	"github.com/google/uuid"
+	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 type Team struct {
 	UUID       uuid.UUID `db:"uuid"`
-	BDL_ID     int       `db:"balldontlie_id"`
+	BDL_ID     int       `json:"id" db:"balldontlie_id"`
 	NBA_ID     string    `db:"nba_id"`
-	Name       string    `db:"name"`
-	Abbrev     string    `db:"abbrev"`
+	Name       string    `json:"full_name" db:"name"`
+	Abbrev     string    `json:"abbreviation" db:"abbrev"`
 	Conference string    `db:"conference"`
 	Division   string    `db:"division"`
 }
@@ -117,6 +119,33 @@ func AddNbaId(ids []NbaData, team Team) (string, error) {
 	}
 
 	return "", fmt.Errorf("no NBA ID for team %s", team.Name)
+}
+
+func GetTeamCache() ([]Team, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	q := `SELECT * FROM teams`
+	dest := &[]Team{}
+
+	if err = tx.SelectContext(ctx, dest, q); err != nil {
+		return nil, err
+	}
+
+	return *dest, nil
 }
 
 // // get all teams in conf - move to Presti, can't query this endpoint

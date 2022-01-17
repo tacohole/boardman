@@ -58,7 +58,7 @@ func (s *SingleGame) GetAllGameStats(season int) ([]SingleGame, error) {
 		}
 
 		for _, d := range page.Data {
-			playerId, err := GetUUIDFromBDLID(d.Player.BDL_ID)
+			playerId, err := GetUUIDFromBDLID(d.Player.BDL_ID) // doesn't work
 			if err != nil {
 				return nil, err
 			}
