@@ -13,10 +13,11 @@ import (
 
 type SingleGame struct {
 	UUID         uuid.UUID `db:"uuid"`
+	BDL_ID       int       `json:"id" db:"balldontlie_id"`
+	GameUUID     uuid.UUID `db:"game_uuid"`
+	GameBDL_ID   int       `db:"game_bdl_id"`
 	PlayerUUID   uuid.UUID `db:"player_uuid"`
 	PlayerBDL_ID int       `db:"player_bdl_id"`
-	GameID       uuid.UUID `db:"game_uuid"`
-	BDL_ID       int       `json:"id" db:"balldontlie_id"`
 	TeamUUID     uuid.UUID `db:"team_uuid"`
 	TeamBDL_ID   int       `db:"team_bdl_id"`
 	Minutes      string    `json:"min" db:"min"`
@@ -63,6 +64,7 @@ func GetGameStatsPage(season int, pageIndex int) ([]SingleGame, error) {
 	for _, d := range page.Data {
 		s.UUID = uuid.New()
 		s.BDL_ID = d.ID
+		s.GameBDL_ID = d.Game.BDL_ID
 		s.PlayerBDL_ID = d.Player.BDL_ID
 		s.TeamBDL_ID = d.Team.BDL_ID
 		s.AST = d.AST
@@ -96,7 +98,6 @@ func PrepareGameStatsSchema() error {
 		balldontlie_id INT,
 		player_uuid UUID,
 		player_bdl_id INT,
-		game_uuid UUID,
 		team_uuid UUID,
 		team_bdl_id INT,
 		min TEXT,

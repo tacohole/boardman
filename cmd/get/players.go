@@ -41,6 +41,40 @@ func getPlayers(cmd *cobra.Command, args []string) {
 	}
 	log.Printf("Inserted %d players", len(players))
 
+	count, err := updatePlayersWithTeamUUIDs()
+	remaining := count - int64(len(players))
+	if err != nil || remaining > 0 {
+		log.Printf("%d players not updated: %s", remaining, err)
+	}
+
+}
+
+// can fail silently with 0 rows updated, so we return count
+func updatePlayersWithTeamUUIDs() (int64, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return 0, err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return 0, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	stmt := `UPDATE players
+			SET team_uuid = teams.uuid
+			FROM teams
+			WHERE players.team_bdl_id = teams.balldontlie_id;`
+
+	result := tx.MustExecContext(ctx, stmt)
+
+	return result.RowsAffected()
 }
 
 func insertPlayerRows(p []internal.Player) error {
@@ -62,16 +96,24 @@ func insertPlayerRows(p []internal.Player) error {
 
 	_, err = tx.NamedExecContext(ctx, `INSERT INTO players (
 		uuid,
+		balldontlie_id,
 		first_name,
 		last_name,
-		balldontlie_id, 
-		team_id )
+		position,
+		height_feet,
+		height_in,
+		weight,
+		team_bdl_id )
 		VALUES (
 			:uuid,
+			:balldontlie_id,
 			:first_name,
 			:last_name,
-			:balldontlie_id,
-			:team_id)`,
+			:position,
+			:height_feet,
+			:height_in,
+			:weight,
+			:team_bdl_id);`,
 		p)
 	if err != nil {
 		return err
@@ -104,9 +146,14 @@ func preparePlayersSchema() error {
  		balldontlie_id INT,
         first_name TEXT,
 		last_name TEXT,
-		team_id uuid,
+		position TEXT,
+		height_feet NUMERIC,
+		height_in NUMERIC,
+		weight NUMERIC,
+		team_uuid uuid,
+		team_bdl_id INT,
         CONSTRAINT fk_teams
-        FOREIGN KEY(team_id)
+        FOREIGN KEY(team_uuid)
         REFERENCES teams(uuid)
 		);`
 

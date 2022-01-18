@@ -20,7 +20,8 @@ type Player struct {
 	HeightFeet int       `json:"height_feet" db:"height_feet"`
 	HeightIn   int       `json:"height_inches" db:"height_in"`
 	Weight     int       `json:"weight_pounds" db:"weight"`
-	TeamID     int       `json:"team" db:"team_id"`
+	TeamUUID   uuid.UUID `db:"team_uuid"`
+	TeamBDL_ID int       `json:"team" db:"team_bdl_id"`
 }
 
 // get player by ID
@@ -72,10 +73,14 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 		}
 		for _, d := range page.Data {
 			p.UUID = uuid.New()
+			p.BDL_ID = d.ID
 			p.FirstName = d.FirstName
 			p.LastName = d.LastName
-			p.BDL_ID = d.ID
-			p.TeamID = d.Team.BDL_ID
+			p.Position = d.Position
+			p.HeightFeet = d.HeightFeet
+			p.HeightIn = d.HeightIn
+			p.Weight = d.Weight
+			p.TeamBDL_ID = d.Team.BDL_ID
 			allPlayers = append(allPlayers, *p)
 		}
 		time.Sleep(1000 * time.Millisecond)

@@ -39,6 +39,10 @@ type Data struct {
 	Division     string  `json:"division"`
 	FirstName    string  `json:"first_name"`
 	LastName     string  `json:"last_name"`
+	Position     string  `json:"position"`
+	HeightFeet   int     `json:"height_feet"`
+	HeightIn     int     `json:"height_inches"`
+	Weight       int     `json:"weight_pounds"`
 	Team         Team    `json:"team"`
 	Date         string  `json:"date"`
 	Home         Team    `json:"home_team"`

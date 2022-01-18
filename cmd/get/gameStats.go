@@ -36,7 +36,7 @@ func getGameStats(cmd *cobra.Command, args []string) {
 		for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
 			gameSlice, err := internal.GetGameStatsPage(i, pageIndex)
 			if err != nil {
-				log.Fatalf("%s", err)
+				log.Fatalf("can't get page %d of stats for season %d: %s", pageIndex, i, err)
 			}
 
 			if err = insertGameStats(gameSlice); err != nil {
@@ -49,15 +49,18 @@ func getGameStats(cmd *cobra.Command, args []string) {
 	}
 
 	// add our UUIDs to new table
-	if err = updateGamesWithPlayerIds(); err != nil {
+	playerResult, err := updateGamesWithPlayerIds()
+	if err != nil || playerResult < 1 {
 		log.Fatalf("can't add player UUIDs to player_game_stats: %s", err)
 	}
 
-	if err = updateGamesWithTeamIds(); err != nil {
+	teamResult, err := updateGamesWithTeamIds()
+	if err != nil || teamResult < 1 {
 		log.Fatalf("can't add team UUIDs to player_game_stats: %s", err)
 	}
 
-	if err = updateGamesWithGameIds(); err != nil {
+	gameResult, err := updateGamesWithGameIds()
+	if err != nil || gameResult < 1 {
 		log.Fatalf("can't add game UUIDs to player_game_stats: %s", err)
 	}
 
@@ -137,15 +140,15 @@ func insertGameStats(stats []internal.SingleGame) error {
 	return nil
 }
 
-func updateGamesWithPlayerIds() error {
+func updateGamesWithPlayerIds() (int64, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -159,20 +162,20 @@ func updateGamesWithPlayerIds() error {
 			FROM players
 			WHERE player_game_stats.player_bdl_id = players.balldontlie_id;`
 
-	tx.MustExecContext(ctx, stmt)
+	result := tx.MustExecContext(ctx, stmt)
 
-	return nil
+	return result.RowsAffected()
 }
 
-func updateGamesWithGameIds() error {
+func updateGamesWithGameIds() (int64, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -184,22 +187,22 @@ func updateGamesWithGameIds() error {
 	stmt := `UPDATE player_game_stats
 			SET game_uuid = games.uuid
 			FROM games
-			WHERE player_game_stats.balldontlie_id = games.balldontlie_id;`
+			WHERE player_game_stats.game_bdl_id = games.balldontlie_id;`
 
-	tx.MustExecContext(ctx, stmt)
+	result := tx.MustExecContext(ctx, stmt)
 
-	return nil
+	return result.RowsAffected()
 }
 
-func updateGamesWithTeamIds() error {
+func updateGamesWithTeamIds() (int64, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -213,7 +216,7 @@ func updateGamesWithTeamIds() error {
 			FROM teams 
 			WHERE player_game_stats.team_bdl_id = teams.balldontlie_id;`
 
-	tx.MustExecContext(ctx, stmt)
+	result := tx.MustExecContext(ctx, stmt)
 
-	return nil
+	return result.RowsAffected()
 }
