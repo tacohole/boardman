@@ -21,10 +21,6 @@ func init() {
 }
 
 func getCoaches(cmd *cobra.Command, args []string) {
-	teamCache, err := internal.GetTeamCache()
-	if err != nil {
-		log.Fatalf("can't get team ids: %s", err)
-	}
 
 	if err := prepareCoachesSchema(); err != nil {
 		log.Fatalf("can't prepare coaches schema, %s", err)
@@ -36,24 +32,43 @@ func getCoaches(cmd *cobra.Command, args []string) {
 			log.Fatalf("can't get coaches for season %d: %s", i, err)
 		}
 
-		coachesWithIds := []internal.Coach{}
-
-		for _, coach := range coaches {
-			teamUUID, err := internal.AddCoachTeamUUID(teamCache, coach)
-			if err != nil {
-				log.Print(err)
-			}
-			coach.TeamID = *teamUUID
-			coachesWithIds = append(coachesWithIds, coach)
-		}
-
-		if err = insertCoaches(coachesWithIds); err != nil {
+		if err = insertCoaches(coaches); err != nil {
 			log.Printf("can't insert coaches for season %d: %s", i, err)
-		} else {
-			log.Printf("inserted %d coaches", len(coachesWithIds))
 		}
 	}
 
+	coachesCount, err := updateCoachesWithTeamIds()
+	if err != nil || coachesCount < 1 {
+		log.Fatalf("can't add team uuids to coaches table: %s", err)
+	}
+
+}
+
+func updateCoachesWithTeamIds() (int64, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return 0, err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return 0, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	stmt := `UPDATE coaches 
+			SET team_uuid = teams.uuid
+			FROM teams 
+			WHERE coaches.team_bdl_id = teams.balldontlie_id;`
+
+	result := tx.MustExecContext(ctx, stmt)
+
+	return result.RowsAffected()
 }
 
 func insertCoaches(c []internal.Coach) error {
