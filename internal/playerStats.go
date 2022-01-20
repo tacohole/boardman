@@ -8,9 +8,9 @@ import (
 )
 
 type PlayerYear struct {
-	PlayerID    uuid.UUID `db:"uuid"`
+	PlayerUUID  uuid.UUID `db:"uuid"`
 	BDL_ID      int       `json:"player_id" db:"balldontlie_id"`
-	LeagueYear  int       `json:"season" db:"league_year"`
+	LeagueYear  int       `json:"season" db:"season"`
 	GamesPlayed int       `json:"games_played" db:"games_played"`
 	Minutes     string    `json:"avg_min" db:"avg_min"`
 	FGM         float32   `json:"fgm" db:"fgm"`
@@ -32,28 +32,29 @@ type PlayerYear struct {
 }
 
 func PreparePlayerStatsSchema() error {
-	schema := `CREATE TABLE player_season_avgs(
-		player_id UUID,
+	schema := `CREATE TABLE IF NOT EXISTS player_season_avgs(
+		uuid UUID,
+		balldontlie_id INT,
 		season INT,
-		avg_min NUMERIC(4,2),
-		fgm NUMERIC(5,2),
-		fga NUMERIC(5,2),
-		fg3m NUMERIC(5,2),
-		fg3a NUMERIC(5,2),
-		oreb NUMERIC(5,2),
-		dreb NUMERIC(5,2),
-		reb NUMERIC(5,2),
-		ast NUMERIC(5,2),
-		stl NUMERIC(5,2),
-		blk NUMERIC(5,2),
-		turnovers NUMERIC(5,2),
-		pf NUMERIC(4,2),
-		pts NUMERIC(5,2),
-		fg_pct NUMERIC(4,3),
-		fg3_pct NUMERIC(4,3),
-		ft_pct NUMERIC(4,3),
+		avg_min TEXT,
+		fgm NUMERIC,
+		fga NUMERIC,
+		fg3m NUMERIC,
+		fg3a NUMERIC,
+		oreb NUMERIC,
+		dreb NUMERIC,
+		reb NUMERIC,
+		ast NUMERIC,
+		stl NUMERIC,
+		blk NUMERIC,
+		turnovers NUMERIC,
+		pf NUMERIC,
+		pts NUMERIC,
+		fg_pct NUMERIC,
+		fg3_pct NUMERIC,
+		ft_pct NUMERIC,
 		CONSTRAINT fk_players
-		FOREIGN KEY(player_id)
+		FOREIGN KEY(uuid)
 		REFERENCES players(uuid));`
 
 	db, err := dbutil.DbConn()

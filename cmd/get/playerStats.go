@@ -15,7 +15,7 @@ import (
 )
 
 var getPlayerStatsCmd = &cobra.Command{
-	Short: "",
+	Short: "gets player season averages",
 	Long:  "",
 	Use:   "player-stats",
 	Run:   getPlayerStats,
@@ -37,16 +37,15 @@ func getPlayerStats(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't get player cache: %s", err)
 	}
 
-	for i := 1979; i < 2021; i++ {
+	for i := 2020; i < 2021; i++ {
 		for _, player := range *playerCache {
 			stats, err := getPlayerSeasonAverages(i, player)
 			if err != nil {
-				log.Printf("can't get stats for %d", player.BDL_ID)
+				log.Printf("can't get stats for %d: %s", player.BDL_ID, err)
 				continue // don't insert
 			}
-			err = insertPlayerSeasonAverages(stats)
-			if err != nil {
-				log.Fatalf("could not insert stats for %d", player.BDL_ID)
+			if err = insertPlayerSeasonAverages(stats); err != nil {
+				log.Fatalf("could not insert stats for %d: %s", player.BDL_ID, err)
 			}
 		}
 	}
@@ -70,9 +69,10 @@ func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := db.NamedExecContext(ctx, `INSERT INTO player_season_avgs (
-		player_id,
-		league_year,
+	_, err = db.NamedExecContext(ctx, `INSERT INTO player_season_avgs (
+		uuid,
+		balldontlie_id,
+		season,
 		avg_min,
 		fgm,
 		fga,
@@ -91,8 +91,9 @@ func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 		fg3_pct,
 		ft_pct
 	) VALUES (
-		:player_id,
-		:league_year,
+		:uuid,
+		:balldontlie_id,
+		:season,
 		:avg_min,
 		:fgm,
 		:fga,
@@ -112,11 +113,10 @@ func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 		:ft_pct )`,
 		stats)
 	if err != nil {
-		log.Printf("Insert failed, %s", result)
+		log.Printf("Insert failed: %s", err)
 		return err
 	}
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		return err
 	}
 
@@ -124,7 +124,7 @@ func insertPlayerSeasonAverages(stats *schema.PlayerYear) error {
 }
 
 func getPlayerSeasonAverages(season int, player schema.Player) (*schema.PlayerYear, error) {
-	getUrl := schema.BDLUrl + schema.BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&player_ids[]=" + fmt.Sprint(player.BDL_ID)
+	getUrl := schema.BDLUrl + schema.BDLSeasonAvg + "?seasons[]=" + fmt.Sprint(season) + "&player_ids[]=" + fmt.Sprint(player.BDL_ID)
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
 		return nil, err
@@ -139,12 +139,12 @@ func getPlayerSeasonAverages(season int, player schema.Player) (*schema.PlayerYe
 	var page schema.Page
 	var playerYear schema.PlayerYear
 
-	err = json.Unmarshal(r, &page)
-	if err != nil {
+	if err = json.Unmarshal(r, &page); err != nil {
 		return nil, err
 	}
 	for _, d := range page.Data {
-		playerYear.PlayerID = player.UUID
+		playerYear.PlayerUUID = player.UUID
+		playerYear.BDL_ID = player.BDL_ID
 		playerYear.LeagueYear = d.LeagueYear
 		playerYear.GamesPlayed = d.GamesPlayed
 		playerYear.Minutes = d.Minutes
@@ -166,6 +166,12 @@ func getPlayerSeasonAverages(season int, player schema.Player) (*schema.PlayerYe
 		playerYear.FT_PCT = d.FT_PCT
 	}
 	time.Sleep(1 * time.Second) // avoiding 429 from BDL
+
+	// erroring here if our call doesn't return any stats
+	if playerYear.GamesPlayed == 0 {
+		return nil, fmt.Errorf("no stats for %d in %d", player.BDL_ID, season)
+	}
+
 	return &playerYear, nil
 }
 
@@ -187,14 +193,9 @@ func getPlayerIdCache() (*[]schema.Player, error) {
 	defer tx.Rollback()
 
 	p := []schema.Player{}
+	q := `SELECT uuid,balldontlie_id FROM players;`
 
-	result, err := tx.NamedExecContext(ctx, `SELECT uuid,balldontlie_id FROM players`, p)
-	if err != nil {
-		log.Printf("Select failed, %s", result)
-		return nil, err
-	}
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.SelectContext(ctx, &p, q); err != nil {
 		return nil, err
 	}
 

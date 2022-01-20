@@ -8,11 +8,12 @@ import (
 )
 
 const (
-	BDLUrl     = "https://balldontlie.io/api/v1/"
-	BDLPlayers = "players"
-	BDLTeams   = "teams"
-	BDLGames   = "games"
-	BDLStats   = "stats"
+	BDLUrl       = "https://balldontlie.io/api/v1/"
+	BDLPlayers   = "players"
+	BDLTeams     = "teams"
+	BDLGames     = "games"
+	BDLStats     = "stats"
+	BDLSeasonAvg = "season_averages"
 )
 
 // PageData is page metadata for balldontlie API responses
