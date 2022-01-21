@@ -38,7 +38,7 @@ func getPlayerStats(cmd *cobra.Command, args []string) {
 	}
 
 	for i := 2020; i < 2021; i++ {
-		for _, player := range *playerCache {
+		for _, player := range playerCache {
 			stats, err := getPlayerSeasonAverages(i, player)
 			if err != nil {
 				log.Printf("can't get stats for %d: %s", player.BDL_ID, err)
@@ -175,7 +175,7 @@ func getPlayerSeasonAverages(season int, player schema.Player) (*schema.PlayerYe
 	return &playerYear, nil
 }
 
-func getPlayerIdCache() (*[]schema.Player, error) {
+func getPlayerIdCache() ([]schema.Player, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
 		return nil, err
@@ -199,5 +199,5 @@ func getPlayerIdCache() (*[]schema.Player, error) {
 		return nil, err
 	}
 
-	return &p, nil
+	return p, nil
 }

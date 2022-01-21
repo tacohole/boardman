@@ -12,7 +12,7 @@ type PlayerYear struct {
 	BDL_ID      int       `json:"player_id" db:"balldontlie_id"`
 	LeagueYear  int       `json:"season" db:"season"`
 	GamesPlayed int       `json:"games_played" db:"games_played"`
-	Minutes     string    `json:"avg_min" db:"avg_min"`
+	Minutes     string    `json:"min" db:"avg_min"`
 	FGM         float32   `json:"fgm" db:"fgm"`
 	FGA         float32   `json:"fga" db:"fga"`
 	FG3M        float32   `json:"fg3m" db:"fg3m"`
@@ -37,22 +37,22 @@ func PreparePlayerStatsSchema() error {
 		balldontlie_id INT,
 		season INT,
 		avg_min TEXT,
-		fgm NUMERIC,
-		fga NUMERIC,
-		fg3m NUMERIC,
-		fg3a NUMERIC,
-		oreb NUMERIC,
-		dreb NUMERIC,
-		reb NUMERIC,
-		ast NUMERIC,
-		stl NUMERIC,
-		blk NUMERIC,
-		turnovers NUMERIC,
-		pf NUMERIC,
-		pts NUMERIC,
-		fg_pct NUMERIC,
-		fg3_pct NUMERIC,
-		ft_pct NUMERIC,
+		fgm NUMERIC(4),
+		fga NUMERIC(4),
+		fg3m NUMERIC(4),
+		fg3a NUMERIC(4),
+		oreb NUMERIC(4),
+		dreb NUMERIC(4),
+		reb NUMERIC(4),
+		ast NUMERIC(4),
+		stl NUMERIC(4),
+		blk NUMERIC(4),
+		turnovers NUMERIC(4),
+		pf NUMERIC(4),
+		pts NUMERIC(4),
+		fg_pct NUMERIC(4),
+		fg3_pct NUMERIC(4),
+		ft_pct NUMERIC(4),
 		CONSTRAINT fk_players
 		FOREIGN KEY(uuid)
 		REFERENCES players(uuid));`

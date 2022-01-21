@@ -14,7 +14,7 @@ type Coach struct {
 	FirstName   string    `db:"first_name"`
 	LastName    string    `db:"last_name"`
 	IsAssistant bool      `db:"is_assistant"`
-	TeamID      uuid.UUID `db:"team_id"`
+	TeamID      uuid.UUID `db:"team_uuid"`
 	Season      int       `db:"season"`
 	NBA_TeamID  string    `db:"nba_team_id"`
 	NBA_ID      string    `db:"nba_id"`

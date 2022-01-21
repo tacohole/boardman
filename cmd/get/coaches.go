@@ -37,6 +37,7 @@ func getCoaches(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	// silently erroring still
 	coachesCount, err := updateCoachesWithTeamIds()
 	if err != nil || coachesCount < 1 {
 		log.Fatalf("can't add team uuids to coaches table: %s", err)
@@ -64,7 +65,7 @@ func updateCoachesWithTeamIds() (int64, error) {
 	stmt := `UPDATE coaches 
 			SET team_uuid = teams.uuid
 			FROM teams 
-			WHERE coaches.team_bdl_id = teams.balldontlie_id;`
+			WHERE coaches.nba_team_id = teams.nba_id;`
 
 	result := tx.MustExecContext(ctx, stmt)
 
@@ -94,7 +95,6 @@ func insertCoaches(c []internal.Coach) error {
 		last_name,
 		is_assistant, 
 		nba_id,
-		team_id,
 		season,
 		nba_team_id 
 	) VALUES (
@@ -103,7 +103,6 @@ func insertCoaches(c []internal.Coach) error {
 		:last_name,
 		:is_assistant, 
 		:nba_id,
-		:team_id,
 		:season,
 		:nba_team_id )`,
 		c)
@@ -137,12 +136,12 @@ func prepareCoachesSchema() error {
  		first_name TEXT,
 		last_name TEXT,
 		is_assistant BOOL,
-		team_id UUID,
+		team_uuid UUID,
 		season INT,
 		nba_team_id TEXT,
 		nba_id TEXT,
 		CONSTRAINT fk_teams
-		FOREIGN KEY(team_id)
+		FOREIGN KEY(team_uuid)
 		REFERENCES teams(uuid));`
 
 	db.MustExecContext(ctx, schema)
