@@ -30,7 +30,7 @@ func getGames(cmd *cobra.Command, args []string) {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 
-	for i := 1979; i < 2021; i++ {
+	for i := 1979; i <= 2021; i++ {
 		games, err := g.GetSeasonGames(i)
 		if err != nil {
 			log.Fatalf("can't get games: %s", err)
@@ -48,6 +48,7 @@ func insertSeasonGames(g []schema.Game) error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {

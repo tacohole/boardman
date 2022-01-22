@@ -113,6 +113,7 @@ func PrepareSeasonSchema() error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
@@ -122,7 +123,7 @@ func PrepareSeasonSchema() error {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	schema := `CREATE TABLE games(
+	schema := `CREATE TABLE IF NOT EXISTS games(
         uuid uuid PRIMARY KEY,
  		balldontlie_id INT,
         date DATE,

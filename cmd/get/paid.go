@@ -23,5 +23,4 @@ func getPaid(cmd *cobra.Command, args []string) {
 	getCoaches(getCoachesCmd, []string{})
 	getGames(getGamesCmd, []string{})
 	getGameStats(getGameStatsCmd, []string{})
-	getPlayerStats(getPlayerStatsCmd, []string{})
 }

@@ -85,6 +85,7 @@ func insertCoaches(c []internal.Coach) error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {

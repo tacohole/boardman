@@ -71,6 +71,7 @@ func insertGameStats(stats []internal.SingleGame) error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
