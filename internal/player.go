@@ -24,30 +24,6 @@ type Player struct {
 	TeamBDL_ID int       `json:"team" db:"team_bdl_id"`
 }
 
-// get player by ID
-func GetPlayerById(id int) (*Player, error) {
-	getUrl := BDLUrl + BDLPlayers + fmt.Sprint(id)
-
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	r, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	p := Player{}
-
-	err = json.Unmarshal(r, &p)
-	if err != nil {
-		return nil, err
-	}
-
-	return &p, nil
-}
-
 // get all players
 func (p *Player) GetAllPlayers() ([]Player, error) {
 	allPlayers := []Player{}

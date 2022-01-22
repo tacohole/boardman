@@ -96,6 +96,8 @@ func (g *Game) CalculateWinnerAndMargin() {
 	}
 }
 
+// this is a different method for syncing the table's UUID but we're leaving it
+// because we are not storing the BDL team ID in this table
 func AddTeamUUID(bdlId int, teamCache []Team) (*uuid.UUID, error) {
 	for j := 0; j < len(teamCache); j++ {
 		if bdlId == teamCache[j].BDL_ID {

@@ -57,14 +57,3 @@ func GetSeasonCoaches(season int) ([]Coach, error) {
 	}
 	return coaches, nil
 }
-
-func AddCoachTeamUUID(teams []Team, coach Coach) (*uuid.UUID, error) {
-
-	for j := 0; j < len(teams); j++ {
-		if coach.NBA_TeamID == teams[j].NBA_ID {
-			return &teams[j].UUID, nil
-		}
-	}
-
-	return nil, fmt.Errorf("no team UUID for coach %s", coach.NBA_ID)
-}

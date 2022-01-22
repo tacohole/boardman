@@ -41,7 +41,7 @@ type SingleGame struct {
 
 func GetGameStatsPage(season int, pageIndex int) ([]SingleGame, error) {
 	var s SingleGame
-	var games []SingleGame // return value
+	var games []SingleGame // init return value
 	var page Page
 
 	getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
