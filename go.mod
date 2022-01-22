@@ -7,7 +7,6 @@ require (
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0
-	github.com/jszwec/csvutil v1.6.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
 )
