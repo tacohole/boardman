@@ -26,6 +26,8 @@ func getCoaches(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't prepare coaches schema, %s", err)
 	}
 
+	coachCount := 0
+
 	for i := 2015; i <= 2021; i++ {
 		coaches, err := internal.GetSeasonCoaches(i)
 		if err != nil {
@@ -35,12 +37,17 @@ func getCoaches(cmd *cobra.Command, args []string) {
 		if err = insertCoaches(coaches); err != nil {
 			log.Printf("can't insert coaches for season %d: %s", i, err)
 		}
+		coachCount += len(coaches)
 	}
 
-	// silently erroring still
-	coachesCount, err := updateCoachesWithTeamIds()
-	if err != nil || coachesCount < 1 {
-		log.Fatalf("can't add team uuids to coaches table: %s", err)
+	log.Printf("inserted %d coaches", coachCount)
+
+	count, err := updateCoachesWithTeamIds()
+	remaining := int64(coachCount) - count
+	if err != nil || remaining > 1 {
+		log.Printf("%d coaches not updated: %s", remaining, err)
+	} else {
+		log.Printf("%d coaches updated", remaining)
 	}
 
 }
@@ -63,11 +70,12 @@ func updateCoachesWithTeamIds() (int64, error) {
 	defer tx.Rollback()
 
 	stmt := `UPDATE coaches 
-			SET team_uuid = teams.uuid
+			SET team_uuid = teams.uuid 
 			FROM teams 
 			WHERE coaches.nba_team_id = teams.nba_id;`
 
 	result := tx.MustExecContext(ctx, stmt)
+	tx.Commit()
 
 	return result.RowsAffected()
 }

@@ -163,6 +163,7 @@ func updateGamesWithPlayerIds() (int64, error) {
 			WHERE player_game_stats.player_bdl_id = players.balldontlie_id;`
 
 	result := tx.MustExecContext(ctx, stmt)
+	tx.Commit()
 
 	return result.RowsAffected()
 }

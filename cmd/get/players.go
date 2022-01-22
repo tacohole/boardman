@@ -73,6 +73,7 @@ func updatePlayersWithTeamUUIDs() (int64, error) {
 			WHERE players.team_bdl_id = teams.balldontlie_id;`
 
 	result := tx.MustExecContext(ctx, stmt)
+	tx.Commit()
 
 	return result.RowsAffected()
 }
