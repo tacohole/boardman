@@ -191,6 +191,7 @@ func updateGamesWithGameIds() (int64, error) {
 			WHERE player_game_stats.game_bdl_id = games.balldontlie_id;`
 
 	result := tx.MustExecContext(ctx, stmt)
+	tx.Commit()
 
 	return result.RowsAffected()
 }
@@ -218,6 +219,7 @@ func updateGamesWithTeamIds() (int64, error) {
 			WHERE player_game_stats.team_bdl_id = teams.balldontlie_id;`
 
 	result := tx.MustExecContext(ctx, stmt)
+	tx.Commit()
 
 	return result.RowsAffected()
 }
