@@ -84,11 +84,14 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 		balldontlie_id,
 		player_bdl_id,
 		team_bdl_id,
+		game_bdl_id,
 		min,
 		fgm,
 		fga,
 		fg3m,
 		fg3a,
+		ftm,
+		fta,
 		oreb,
 		dreb,
 		reb,
@@ -106,9 +109,12 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 		:balldontlie_id,
 		:player_bdl_id,
 		:team_bdl_id,
+		:game_bdl_id,
 		:min,
 		:fgm,
 		:fga,
+		:ftm,
+		:fta,
 		:fg3m,
 		:fg3a,
 		:oreb,
@@ -173,6 +179,9 @@ func InsertGameStats(season int) error {
 			s.FG3_PCT = d.FG3_PCT
 			s.FGA = d.FGA
 			s.FGM = d.FGM
+			s.FG_PCT = d.FG_PCT
+			s.FTA = d.FTA
+			s.FTM = d.FTM
 			s.FT_PCT = d.FT_PCT
 			s.Minutes = d.Minutes
 			s.OREB = d.OREB

@@ -19,6 +19,8 @@ type SingleGame struct {
 	Minutes      string    `json:"min" db:"min"`
 	FGM          float32   `json:"fgm" db:"fgm"`
 	FGA          float32   `json:"fga" db:"fga"`
+	FTM          float32   `db:"ftm"`
+	FTA          float32   `db:"fta"`
 	FG3M         float32   `json:"fg3m" db:"fg3m"`
 	FG3A         float32   `json:"fg3a" db:"fg3a"`
 	OREB         float32   `json:"oreb" db:"oreb"`
@@ -48,6 +50,8 @@ func PrepareGameStatsSchema() error {
 		min TEXT,
 		fgm NUMERIC,
 		fga NUMERIC,
+		ftm NUMERIC,
+		fta NUMERIC,
 		fg3m NUMERIC,
 		fg3a NUMERIC,
 		oreb NUMERIC,

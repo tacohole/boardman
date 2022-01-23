@@ -44,12 +44,14 @@ type Data struct {
 	VisitorScore int     `json:"visitor_team_score"`
 	LeagueYear   int     `json:"season"`
 	IsPostseason bool    `json:"postseason"`
-	Minutes      string  `json:"avg_min" db:"avg_min"`
+	Minutes      string  `json:"min" db:"min"`
 	Game         Game    `json:"game"`
 	GamesPlayed  int     `json:"games_played"`
 	Player       Player  `json:"player"`
 	FGM          float32 `json:"fgm" db:"fgm"`
 	FGA          float32 `json:"fga" db:"fga"`
+	FTM          float32 `json:"ftm"`
+	FTA          float32 `json:"fta"`
 	FG3M         float32 `json:"fg3m" db:"fg3m"`
 	FG3A         float32 `json:"fg3a" db:"fg3a"`
 	OREB         float32 `json:"oreb" db:"oreb"`
@@ -58,7 +60,7 @@ type Data struct {
 	AST          float32 `json:"ast" db:"ast"`
 	STL          float32 `json:"stl" db:"stl"`
 	BLK          float32 `json:"blk" db:"blk"`
-	TO           float32 `json:"to" db:"to"`
+	TO           float32 `json:"turnover"`
 	PF           float32 `json:"pf" db:"pf"`
 	PTS          float32 `json:"pts" db:"pts"`
 	FG_PCT       float32 `json:"fg_pct" db:"fg_pct"`
