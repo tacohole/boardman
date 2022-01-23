@@ -2,12 +2,17 @@ package get
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	internal "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
+	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 // no queries just paginate
@@ -30,20 +35,10 @@ func getGameStats(cmd *cobra.Command, args []string) {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 
-	for i := 2020; i <= 2021; i++ {
-		var page internal.Page
+	for i := 1979; i <= 2021; i++ {
 
-		for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
-			gameSlice, err := internal.GetGameStatsPage(i, pageIndex)
-			if err != nil {
-				log.Fatalf("can't get page %d of stats for season %d: %s", pageIndex, i, err)
-			}
-
-			if err = insertGameStats(gameSlice); err != nil {
-				log.Fatalf("can't insert games for season %d: %s", i, err)
-			}
-
-			time.Sleep(1000 * time.Millisecond) // more 429 dodging
+		if err := InsertGameStats(i); err != nil {
+			log.Fatalf("can't get stats for season %d: %s", i, err)
 		}
 
 	}
@@ -66,7 +61,7 @@ func getGameStats(cmd *cobra.Command, args []string) {
 
 }
 
-func insertGameStats(stats []internal.SingleGame) error {
+func insertGameStatsPage(stats []internal.SingleGame) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
 		return err
@@ -136,6 +131,66 @@ func insertGameStats(stats []internal.SingleGame) error {
 	err = tx.Commit()
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func InsertGameStats(season int) error {
+	var s internal.SingleGame
+	var games []internal.SingleGame // init return value
+	var page internal.Page
+
+	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
+		getUrl := internal.BDLUrl + internal.BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
+
+		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		r, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		if err = json.Unmarshal(r, &page); err != nil {
+			return err
+		}
+
+		for _, d := range page.Data {
+			s.UUID = uuid.New()
+			s.BDL_ID = d.ID
+			s.GameBDL_ID = d.Game.BDL_ID
+			s.PlayerBDL_ID = d.Player.BDL_ID
+			s.TeamBDL_ID = d.Team.BDL_ID
+			s.AST = d.AST
+			s.BLK = d.BLK
+			s.DREB = d.DREB
+			s.FG3A = d.FG3A
+			s.FG3M = d.FG3M
+			s.FG3_PCT = d.FG3_PCT
+			s.FGA = d.FGA
+			s.FGM = d.FGM
+			s.FT_PCT = d.FT_PCT
+			s.Minutes = d.Minutes
+			s.OREB = d.OREB
+			s.PF = d.OREB
+			s.PF = d.PF
+			s.PTS = d.PTS
+			s.REB = d.REB
+			s.STL = d.STL
+			s.TO = d.TO
+			games = append(games, s)
+		}
+		if err := insertGameStatsPage(games); err != nil {
+			return fmt.Errorf("can't insert games: %s", err)
+		}
+		// reset the value to add to the db
+		games = []internal.SingleGame{}
+
+		time.Sleep(1000 * time.Millisecond)
 	}
 
 	return nil

@@ -79,7 +79,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 			g.CalculateWinnerAndMargin()
 			allGames = append(allGames, *g)
 		}
-		time.Sleep(2000 * time.Millisecond) // avoiding 429 from BDL
+		time.Sleep(1000 * time.Millisecond) // avoiding 429 from BDL
 	}
 	return allGames, nil
 }

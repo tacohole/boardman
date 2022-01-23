@@ -2,13 +2,9 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 
 	"github.com/google/uuid"
 	dbutil "github.com/tacohole/boardman/util/db"
-	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 type SingleGame struct {
@@ -39,59 +35,6 @@ type SingleGame struct {
 	FT_PCT       float32   `json:"ft_pct" db:"ft_pct"`
 }
 
-func GetGameStatsPage(season int, pageIndex int) ([]SingleGame, error) {
-	var s SingleGame
-	var games []SingleGame // init return value
-	var page Page
-
-	getUrl := BDLUrl + BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
-
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	r, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(r, &page); err != nil {
-		return nil, err
-	}
-
-	for _, d := range page.Data {
-		s.UUID = uuid.New()
-		s.BDL_ID = d.ID
-		s.GameBDL_ID = d.Game.BDL_ID
-		s.PlayerBDL_ID = d.Player.BDL_ID
-		s.TeamBDL_ID = d.Team.BDL_ID
-		s.AST = d.AST
-		s.BLK = d.BLK
-		s.DREB = d.DREB
-		s.FG3A = d.FG3A
-		s.FG3M = d.FG3M
-		s.FG3_PCT = d.FG3_PCT
-		s.FGA = d.FGA
-		s.FGM = d.FGM
-		s.FT_PCT = d.FT_PCT
-		// s.GameID = *gameId insert later
-		s.Minutes = d.Minutes
-		s.OREB = d.OREB
-		s.PF = d.OREB
-		s.PF = d.PF
-		s.PTS = d.PTS
-		// s.PlayerUUID = *playerId insert later
-		s.REB = d.REB
-		s.STL = d.STL
-		s.TO = d.TO
-		games = append(games, s)
-	}
-
-	return games, nil
-}
-
 func PrepareGameStatsSchema() error {
 	schema := `CREATE TABLE player_game_stats(
 		uuid UUID PRIMARY KEY,
@@ -100,6 +43,8 @@ func PrepareGameStatsSchema() error {
 		player_bdl_id INT,
 		team_uuid UUID,
 		team_bdl_id INT,
+		game_uuid UUID,
+		game_bdl_id INT,
 		min TEXT,
 		fgm NUMERIC,
 		fga NUMERIC,
