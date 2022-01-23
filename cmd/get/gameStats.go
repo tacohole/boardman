@@ -28,7 +28,7 @@ func init() {
 }
 
 func getGameStats(cmd *cobra.Command, args []string) {
-	// loadDefaultVariables()
+	loadDefaultVariables()
 
 	err := internal.PrepareGameStatsSchema()
 	if err != nil {
@@ -37,7 +37,7 @@ func getGameStats(cmd *cobra.Command, args []string) {
 
 	for i := 1979; i <= 2021; i++ {
 
-		if err := InsertGameStats(i); err != nil {
+		if err := insertGameStats(i); err != nil {
 			log.Fatalf("can't get stats for season %d: %s", i, err)
 		}
 
@@ -142,7 +142,7 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 	return nil
 }
 
-func InsertGameStats(season int) error {
+func insertGameStats(season int) error {
 	var s internal.SingleGame
 	var games []internal.SingleGame // init return value
 	var page internal.Page

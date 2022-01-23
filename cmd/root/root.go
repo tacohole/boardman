@@ -25,10 +25,11 @@ import (
 	get "github.com/tacohole/boardman/cmd/get"
 )
 
+var verbose bool
+
 // var (
 // 	// cfgFile   string
 // 	// dbTimeout time.Duration
-// 	// verbose   bool
 // )
 
 // rootCmd represents the base command when called without any subcommands
@@ -52,7 +53,7 @@ func init() {
 
 	// RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", config.ConfigPath+config.ConfigFileName))
 	// RootCmd.PersistentFlags().DurationVar(&dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
-	// RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, fmt.Sprintln("Include additional logging information"))
+	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", true, fmt.Sprintln("Include additional logging information"))
 
 	RootCmd.AddCommand(get.GetCmd)
 	RootCmd.AddCommand(genConfig.ConfigCmd)

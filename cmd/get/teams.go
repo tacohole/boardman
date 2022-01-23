@@ -21,7 +21,7 @@ func init() {
 }
 
 func getTeamData(cmd *cobra.Command, args []string) {
-	//	loadDefaultVariables()
+	loadDefaultVariables()
 
 	err := prepareTeamsSchema()
 	if err != nil {

@@ -2,6 +2,7 @@ package get
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var GetCmd = &cobra.Command{
@@ -11,8 +12,8 @@ var GetCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 }
 
-// var verbose bool
+var verbose bool
 
-// func loadDefaultVariables() {
-// 	verbose = viper.GetBool("verbose")
-// }
+func loadDefaultVariables() {
+	verbose = viper.GetBool("verbose")
+}

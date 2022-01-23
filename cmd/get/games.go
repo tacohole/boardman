@@ -21,7 +21,7 @@ func init() {
 }
 
 func getGames(cmd *cobra.Command, args []string) {
-	// loadDefaultVariables()
+	loadDefaultVariables()
 
 	g := schema.Game{}
 

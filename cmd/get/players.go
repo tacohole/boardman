@@ -22,7 +22,7 @@ func init() {
 }
 
 func getPlayers(cmd *cobra.Command, args []string) {
-	// loadDefaultVariables()
+	loadDefaultVariables()
 
 	err := preparePlayersSchema()
 	if err != nil {
@@ -39,7 +39,9 @@ func getPlayers(cmd *cobra.Command, args []string) {
 	if err := insertPlayerRows(players); err != nil {
 		log.Printf("Could not perform insert:, %s", err)
 	}
-	log.Printf("Inserted %d players", len(players))
+	if verbose {
+		log.Printf("Inserted %d players", len(players))
+	}
 
 	count, err := updatePlayersWithTeamUUIDs()
 	remaining := count - int64(len(players))

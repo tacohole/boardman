@@ -21,7 +21,7 @@ func init() {
 }
 
 func getCoaches(cmd *cobra.Command, args []string) {
-
+	loadDefaultVariables()
 	if err := prepareCoachesSchema(); err != nil {
 		log.Fatalf("can't prepare coaches schema, %s", err)
 	}
@@ -40,13 +40,15 @@ func getCoaches(cmd *cobra.Command, args []string) {
 		coachCount += len(coaches)
 	}
 
-	log.Printf("inserted %d coaches", coachCount)
+	if verbose {
+		log.Printf("inserted %d coaches", coachCount)
+	}
 
 	count, err := updateCoachesWithTeamIds()
 	remaining := int64(coachCount) - count
 	if err != nil || remaining > 1 {
 		log.Printf("%d coaches not updated: %s", remaining, err)
-	} else {
+	} else if verbose {
 		log.Printf("%d coaches updated", remaining)
 	}
 

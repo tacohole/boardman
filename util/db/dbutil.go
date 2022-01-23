@@ -1,7 +1,6 @@
 package dbutil
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -21,7 +20,6 @@ func DbConn() (*sqlx.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Connected to Postgres\n")
 
 	return db, nil
 }
