@@ -7,7 +7,7 @@ import (
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
-type PlayerYear struct {
+type PlayerSeason struct {
 	PlayerUUID  uuid.UUID `db:"uuid"`
 	BDL_ID      int       `json:"player_id" db:"balldontlie_id"`
 	LeagueYear  int       `json:"season" db:"season"`
@@ -31,8 +31,8 @@ type PlayerYear struct {
 	FT_PCT      float32   `json:"ft_pct" db:"ft_pct"`
 }
 
-func PreparePlayerStatsSchema() error {
-	schema := `CREATE TABLE IF NOT EXISTS player_season_avgs(
+func PreparePlayerSeasonSchema() error {
+	schema := `CREATE TABLE IF NOT EXISTS player_season(
 		uuid UUID,
 		balldontlie_id INT,
 		season INT,
