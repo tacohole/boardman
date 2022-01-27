@@ -24,6 +24,24 @@ type Player struct {
 	TeamBDL_ID int       `json:"team" db:"team_bdl_id"`
 }
 
+const (
+	PlayerSchema = `CREATE TABLE players(
+	uuid uuid PRIMARY KEY,
+	 balldontlie_id INT,
+	first_name TEXT,
+	last_name TEXT,
+	position TEXT,
+	height_feet NUMERIC,
+	height_in NUMERIC,
+	weight NUMERIC,
+	team_uuid uuid,
+	team_bdl_id INT,
+	CONSTRAINT fk_teams
+	FOREIGN KEY(team_uuid)
+	REFERENCES teams(uuid)
+	);`
+)
+
 // get all players
 func (p *Player) GetAllPlayers() ([]Player, error) {
 	allPlayers := []Player{}

@@ -22,6 +22,18 @@ type Team struct {
 	Division   string    `db:"division"`
 }
 
+const (
+	TeamSchema = `CREATE TABLE teams(
+	uuid uuid PRIMARY KEY,
+	balldontlie_id INT UNIQUE,
+	nba_id TEXT,
+	name TEXT,
+	abbrev TEXT,
+	conference TEXT,
+	division TEXT
+	); `
+)
+
 // get all teams
 func (t *Team) GetAllTeams() ([]Team, error) {
 	allTeams := []Team{}

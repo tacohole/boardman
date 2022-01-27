@@ -1,6 +1,7 @@
 package dbutil
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
@@ -33,6 +34,25 @@ func GenerateTimeout() (*time.Duration, error) {
 	}
 
 	return &timeout, nil
+}
+
+func PrepareSchema(schema string) error {
+	db, err := DbConn()
+	if err != nil {
+		return err
+	}
+
+	timeout, err := GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	db.MustExecContext(ctx, schema)
+
+	return nil
 }
 
 // github.com/jackc/pgx/v4/pgxpool - look into connection pooling later

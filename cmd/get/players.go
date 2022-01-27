@@ -24,7 +24,7 @@ func init() {
 func getPlayers(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	err := preparePlayersSchema()
+	err := dbutil.PrepareSchema(internal.PlayerSchema)
 	if err != nil {
 		log.Fatalf("can't create players schema: %s", err)
 	}
@@ -129,39 +129,4 @@ func insertPlayerRows(p []internal.Player) error {
 
 	return nil
 
-}
-
-func preparePlayersSchema() error {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	schema := `CREATE TABLE players(
-        uuid uuid PRIMARY KEY,
- 		balldontlie_id INT,
-        first_name TEXT,
-		last_name TEXT,
-		position TEXT,
-		height_feet NUMERIC,
-		height_in NUMERIC,
-		weight NUMERIC,
-		team_uuid uuid,
-		team_bdl_id INT,
-        CONSTRAINT fk_teams
-        FOREIGN KEY(team_uuid)
-        REFERENCES teams(uuid)
-		);`
-
-	db.MustExecContext(ctx, schema)
-
-	return nil
 }

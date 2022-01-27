@@ -22,7 +22,8 @@ func init() {
 
 func getCoaches(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
-	if err := prepareCoachesSchema(); err != nil {
+
+	if err := dbutil.PrepareSchema(internal.CoachesSchema); err != nil {
 		log.Fatalf("can't prepare coaches schema, %s", err)
 	}
 
@@ -124,38 +125,6 @@ func insertCoaches(c []internal.Coach) error {
 	if err = tx.Commit(); err != nil {
 		return err
 	}
-
-	return nil
-}
-
-func prepareCoachesSchema() error {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	schema := `CREATE TABLE coaches(
-        uuid UUID PRIMARY KEY,
- 		first_name TEXT,
-		last_name TEXT,
-		is_assistant BOOL,
-		team_uuid UUID,
-		season INT,
-		nba_team_id TEXT,
-		nba_id TEXT,
-		CONSTRAINT fk_teams
-		FOREIGN KEY(team_uuid)
-		REFERENCES teams(uuid));`
-
-	db.MustExecContext(ctx, schema)
 
 	return nil
 }

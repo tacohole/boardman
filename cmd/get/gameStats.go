@@ -30,8 +30,7 @@ func init() {
 func getGameStats(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	err := internal.PrepareGameStatsSchema()
-	if err != nil {
+	if err := dbutil.PrepareSchema(internal.GameStatsSchema); err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 

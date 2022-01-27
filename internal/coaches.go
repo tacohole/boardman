@@ -20,6 +20,21 @@ type Coach struct {
 	NBA_ID      string    `db:"nba_id"`
 }
 
+const (
+	CoachesSchema = `CREATE TABLE coaches(
+	uuid UUID PRIMARY KEY,
+	 first_name TEXT,
+	last_name TEXT,
+	is_assistant BOOL,
+	team_uuid UUID,
+	season INT,
+	nba_team_id TEXT,
+	nba_id TEXT,
+	CONSTRAINT fk_teams
+	FOREIGN KEY(team_uuid)
+	REFERENCES teams(uuid));`
+)
+
 func GetSeasonCoaches(season int) ([]Coach, error) {
 	getUrl := NbaDataUrl + fmt.Sprint(season) + Coaches
 

@@ -1,10 +1,7 @@
 package internal
 
 import (
-	"context"
-
 	"github.com/google/uuid"
-	dbutil "github.com/tacohole/boardman/util/db"
 )
 
 type SingleGame struct {
@@ -37,8 +34,8 @@ type SingleGame struct {
 	FT_PCT       float32   `json:"ft_pct" db:"ft_pct"`
 }
 
-func PrepareGameStatsSchema() error {
-	schema := `CREATE TABLE player_game_stats(
+const (
+	GameStatsSchema = `CREATE TABLE player_game_stats(
 		uuid UUID PRIMARY KEY,
 		balldontlie_id INT,
 		player_uuid UUID,
@@ -76,21 +73,4 @@ func PrepareGameStatsSchema() error {
 		FOREIGN KEY(game_uuid)
 		REFERENCES games(uuid)
 	);`
-
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	db.MustExecContext(ctx, schema)
-
-	return nil
-}
+)

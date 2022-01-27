@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,7 +8,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
@@ -26,6 +24,29 @@ type Game struct {
 	Winner       uuid.UUID `json:"winner" db:"winner_id"`
 	Margin       int       `json:"margin" db:"margin"`
 }
+
+const (
+	GameSchema = `CREATE TABLE IF NOT EXISTS games(
+	uuid uuid PRIMARY KEY,
+	 balldontlie_id INT,
+	date DATE,
+	home_id UUID,
+	visitor_id UUID,
+	home_score INT,
+	visitor_score INT,
+	season INT,
+	winner_id UUID,
+	margin INT,
+	is_postseason BOOL,
+	CONSTRAINT fk_teams
+	   FOREIGN KEY(home_id)
+	   REFERENCES teams(uuid),
+	   FOREIGN KEY(visitor_id)
+	   REFERENCES teams(uuid),
+	   FOREIGN KEY(winner_id)
+	   REFERENCES teams(uuid)
+	); `
+)
 
 // get all games for a season
 func (g *Game) GetSeasonGames(season int) ([]Game, error) {
@@ -106,45 +127,4 @@ func AddTeamUUID(bdlId int, teamCache []Team) (*uuid.UUID, error) {
 	}
 
 	return nil, fmt.Errorf("no team UUID for team %d", bdlId)
-}
-
-func PrepareSeasonSchema() error {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	schema := `CREATE TABLE IF NOT EXISTS games(
-        uuid uuid PRIMARY KEY,
- 		balldontlie_id INT,
-        date DATE,
-        home_id UUID,
-        visitor_id UUID,
-        home_score INT,
-        visitor_score INT,
-        season INT,
-        winner_id UUID,
-        margin INT,
-        is_postseason BOOL,
-        CONSTRAINT fk_teams
-           FOREIGN KEY(home_id)
-           REFERENCES teams(uuid),
-           FOREIGN KEY(visitor_id)
-           REFERENCES teams(uuid),
-           FOREIGN KEY(winner_id)
-           REFERENCES teams(uuid)
-		); `
-
-	db.MustExecContext(ctx, schema)
-
-	return nil
 }

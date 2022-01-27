@@ -23,7 +23,7 @@ func init() {
 func getTeamData(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	err := prepareTeamsSchema()
+	err := dbutil.PrepareSchema(internal.TeamSchema)
 	if err != nil {
 		log.Fatalf("can't create teams schema: %s", err)
 	}
@@ -97,33 +97,4 @@ func insertTeams(t []internal.Team) error {
 
 	return nil
 
-}
-
-func prepareTeamsSchema() error {
-	db, err := dbutil.DbConn()
-	if err != nil {
-		return err
-	}
-
-	timeout, err := dbutil.GenerateTimeout()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
-
-	schema := `CREATE TABLE teams(
-        uuid uuid PRIMARY KEY,
- 		balldontlie_id INT UNIQUE,
-		nba_id TEXT,
-        name TEXT,
-		abbrev TEXT,
-		conference TEXT,
-		division TEXT
-		); `
-
-	db.MustExecContext(ctx, schema)
-
-	return nil
 }
