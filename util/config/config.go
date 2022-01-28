@@ -19,7 +19,7 @@ const (
 type Configuration struct {
 	DbUrl     string
 	DbTimeout string
-	Verbose   bool
+	Verbose   string
 }
 
 var config *Configuration
@@ -39,8 +39,8 @@ func getConfig() *Configuration {
 		log.Println("No database timeout set")
 	}
 
-	config.Verbose = viper.GetBool(Verbose)
-	if !config.Verbose {
+	config.Verbose = viper.GetString(Verbose)
+	if config.Verbose == "false" {
 		log.Println("additional logging disabled")
 	}
 

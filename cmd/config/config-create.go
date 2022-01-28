@@ -23,6 +23,7 @@ var generateConfigCmd = &cobra.Command{
 func init() {
 	generateConfigCmd.Flags().StringVar(&dbUrlConfig, "dbUrl", "", "connection string to your database")
 	generateConfigCmd.Flags().StringVar(&dbTimeOutConfig, "dbTimeout", "", "database timeout setting")
+	generateConfigCmd.Flags().StringVar(&verboseConfig, "verbose", "false", "enable additional log output")
 
 	ConfigCmd.AddCommand(generateConfigCmd)
 }
@@ -39,11 +40,16 @@ func generateConfig(cmd *cobra.Command, args []string) {
 		log.Fatalf("Could not read database timeout: %s", err)
 	}
 
-	setConfigVars(dbUrl, dbTimeOut)
+	verbose, err := cmd.Flags().GetString(verboseConfig)
+	if err != nil {
+		log.Fatalf("Could not read log level: %s", err)
+	}
+
+	setConfigVars(dbUrl, dbTimeOut, verbose)
 	writeConfig()
 }
 
-func setConfigVars(dbUrl string, dbTimeOut string) {
+func setConfigVars(dbUrl string, dbTimeOut string, verbose string) {
 	var config *config.Configuration
 
 	if strings.TrimSpace(dbUrl) != "" {
@@ -56,6 +62,10 @@ func setConfigVars(dbUrl string, dbTimeOut string) {
 			log.Printf("%s", err)
 		}
 		viper.Set(config.DbTimeout, timeDur)
+	}
+
+	if verboseConfig != "" {
+		viper.Set(config.Verbose, verboseConfig)
 	}
 
 }
