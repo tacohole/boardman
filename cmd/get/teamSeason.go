@@ -1,11 +1,13 @@
 package get
 
 import (
+	"context"
 	"log"
 
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"github.com/tacohole/boardman/internal"
+	dbutil "github.com/tacohole/boardman/util/db"
 )
 
 var getTeamSeasonCmd = &cobra.Command{
@@ -48,6 +50,7 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 			}
 			ts.Losses = *l
 
+			// calc wpct for team
 			ts.WinPct = float32(ts.Wins) / (float32(ts.Wins) + float32(ts.Losses))
 
 			playoffs, err := setMadePlayoffs(team, i)
@@ -69,6 +72,10 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 				}
 				ts.PSLosses = *psLosses
 
+			}
+
+			if err = insertTeamSeasonRecord(ts); err != nil {
+				log.Printf("can't insert team record: %s", err)
 			}
 
 		}
@@ -105,7 +112,98 @@ func sumPsLosses(t internal.Team, season int) (*int, error) {
 	return nil, nil
 }
 
-// calc wpct for all teams
+func insertTeamSeasonRecord(ts internal.TeamSeason) error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	query := `INSERT INTO team_season(
+		uuid
+		team_uuid
+		season
+		wins
+		losses
+		postseason_wins
+		postseason_losses
+		wpct
+		plus_minus
+		conf_rank
+		ovr_rank
+		made_playoffs
+		fgm
+		fga
+		ftm
+		fta
+		fg3m
+		fg3a
+		oreb
+		dreb
+		reb
+		ast
+		stl
+		blk
+		turnovers
+		pf
+		pts
+		fg_pct
+		fg3_pct
+		ft_pct
+		roster
+		coaches,
+		VALUES
+		:uuid
+		:team_uuid
+		:season
+		:wins
+		:losses
+		:postseason_wins
+		:postseason_losses
+		:wpct
+		:plus_minus
+		:conf_rank
+		:ovr_rank
+		:made_playoffs
+		:fgm
+		:fga
+		:ftm
+		:fta
+		:fg3m
+		:fg3a
+		:oreb
+		:dreb
+		:reb
+		:ast
+		:stl
+		:blk
+		:turnovers
+		:pf
+		:pts
+		:fg_pct
+		:fg3_pct
+		:ft_pct
+		:roster
+		:coaches);`
+
+	_, err = tx.NamedExecContext(ctx, query, ts)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // calculate +/-: sum win margin, sum loss margin, subtract win from loss
 // get conf rank - sort by wpct within conference
 // get overall rank - sort by wpct
