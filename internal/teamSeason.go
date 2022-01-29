@@ -13,6 +13,8 @@ type TeamSeason struct {
 	Season       int         `db:"season"`
 	Wins         int         `db:"wins"`
 	Losses       int         `db:"losses"`
+	PSWins       int         `db:"postseason_wins"`
+	PSLosses     int         `db:"postseason_losses"`
 	WinPct       float32     `db:"wpct"`
 	PlusMinus    int         `db:"plus_minus"`
 	ConfRank     int         `db:"conf_rank"`
@@ -47,6 +49,8 @@ func PrepareTeamSeasonSchema() error {
 	season INT
 	wins INT
 	losses INT
+	postseason_wins INT
+	postseason_losses INT
 	wpct NUMERIC
 	plus_minus INT
 	conf_rank INT
@@ -94,11 +98,6 @@ func PrepareTeamSeasonSchema() error {
 	return nil
 }
 
-// sum wins for all teams
-// sum losses for all teams
-// sum wpct for all teams
-// calculate +/-: sum win margin, sum loss margin, subtract win from loss
-// get conf rank - sort by wpct within conference
 // get conf champ - get last game won within conf
 // get league champ - get last game won in season
 // get is_postseason for each team/year
