@@ -38,13 +38,14 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 			ts.TeamUUID = team.UUID
 			ts.Season = i
 
-			w, err := sumTeamWins(team, i)
+			// game values first
+			w, err := sumTeamWins(ts)
 			if err != nil {
 				log.Fatalf("can't sum team wins: %s", err)
 			}
 			ts.Wins = *w
 
-			l, err := sumTeamLosses(team, i)
+			l, err := sumTeamLosses(ts)
 			if err != nil {
 				log.Fatalf("can't sum team wins: %s", err)
 			}
@@ -53,26 +54,28 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 			// calc wpct for team
 			ts.WinPct = float32(ts.Wins) / (float32(ts.Wins) + float32(ts.Losses))
 
-			playoffs, err := setMadePlayoffs(team, i)
+			playoffs, err := setMadePlayoffs(ts)
 			if err != nil {
 				log.Fatalf("can't set made playoffs: %s", err)
 			}
 			ts.MadePlayoffs = *playoffs
 
 			if *playoffs {
-				psWins, err := sumPsWins(team, i)
+				psWins, err := sumPsWins(ts)
 				if err != nil {
 					log.Fatalf("can't sum playoff wins: %s", err)
 				}
 				ts.PSWins = *psWins
 
-				psLosses, err := sumPsLosses(team, i)
+				psLosses, err := sumPsLosses(ts)
 				if err != nil {
 					log.Fatalf("can't sum playoff losses: %s", err)
 				}
 				ts.PSLosses = *psLosses
 
 			}
+
+			// gameStats values here
 
 			if err = insertTeamSeasonRecord(ts); err != nil {
 				log.Printf("can't insert team record: %s", err)
@@ -83,33 +86,189 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 
 }
 
-func sumTeamWins(t internal.Team, season int) (*int, error) {
+func sumTeamWins(ts internal.TeamSeason) (*int, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
 
-	// lookup all games for team in season
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
 	// return count of games where winner = team && is_postseason = false
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT COUNT(*) 
+		FROM games
+		WHERE season = :season
+		AND winner_id = :team_uuid 
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	var wins int // init return value
+	if err = rows.Scan(wins); err != nil {
+		return nil, err
+	}
+
+	return &wins, nil
 }
 
-func sumTeamLosses(t internal.Team, season int) (*int, error) {
-	// lookup all games for team in season
-	// return count of games where winner != team && is_postseason = false
+// return count of games where winner != team && is_postseason = false
+func sumTeamLosses(ts internal.TeamSeason) (*int, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
 
-	return nil, nil
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return count of games where winner = team && is_postseason = false
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT COUNT(*) 
+		FROM games
+		WHERE season = :season
+		AND (visitor_id = :team_uuid OR home_id = :team_uuid)
+		AND winner_id != :team_uuid 
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var losses int // init return value
+	if err = rows.Scan(losses); err != nil {
+		return nil, err
+	}
+
+	return &losses, nil
 }
 
-func setMadePlayoffs(t internal.Team, season int) (*bool, error) {
-	// for team in season where is_postseason = true
+// for team in season where is_postseason = true
+func setMadePlayoffs(ts internal.TeamSeason) (*bool, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
 
-	return nil, nil
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	var playoffGames int
+	var madePlayoffs bool
+
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT COUNT(*) 
+		FROM games
+		WHERE season = :season
+		AND (visitor_id = :team_uuid OR home_id = :team_uuid)
+		AND is_postseason = 't'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+	if err = rows.Scan(playoffGames); err != nil {
+		return nil, err
+	}
+
+	if playoffGames > 0 {
+		madePlayoffs = true
+	} else {
+		madePlayoffs = false
+	}
+
+	return &madePlayoffs, nil
 }
 
-func sumPsWins(t internal.Team, season int) (*int, error) {
-	return nil, nil
+func sumPsWins(ts internal.TeamSeason) (*int, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return count of games where winner = team && is_postseason = false
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT COUNT(*) 
+		FROM games
+		WHERE season = :season
+		AND winner_id = :team_uuid 
+		AND is_postseason = 't'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var wins int // init return value
+	if err = rows.Scan(wins); err != nil {
+		return nil, err
+	}
+
+	return &wins, nil
 }
 
-func sumPsLosses(t internal.Team, season int) (*int, error) {
-	return nil, nil
+func sumPsLosses(ts internal.TeamSeason) (*int, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return count of games where winner = team && is_postseason = false
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT COUNT(*) 
+		FROM games
+		WHERE season = :season
+		AND (visitor_id = :team_uuid OR home_id = :team_uuid)
+		AND winner_id != :team_uuid 
+		AND is_postseason = 't'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var losses int // init return value
+	if err = rows.Scan(losses); err != nil {
+		return nil, err
+	}
+
+	return &losses, nil
 }
 
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {
