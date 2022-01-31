@@ -58,6 +58,41 @@ func getGameStats(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't add game UUIDs to player_game_stats: %s", err)
 	}
 
+	if err := cleanupDuplicateStats(); err != nil {
+		log.Printf("can't remove duplicate values from games: %s", err)
+	}
+
+}
+
+func cleanupDuplicateStats() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	q := `DELETE FROM player_game_stats a 
+		USING player_game_stats b 
+		WHERE a.uuid < b.uuid 
+		AND a.balldontlie_id = b.balldontlie_id;`
+
+	_, err = tx.ExecContext(ctx, q)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func insertGameStatsPage(stats []internal.SingleGame) error {

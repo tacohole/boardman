@@ -40,6 +40,41 @@ func getGames(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	if err := cleanupDuplicateGames(); err != nil {
+		log.Printf("can't remove duplicate values from games: %s", err)
+	}
+
+}
+
+func cleanupDuplicateGames() error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	q := `DELETE FROM games a 
+		USING games b 
+		WHERE a.uuid < b.uuid 
+		AND a.balldontlie_id = b.balldontlie_id;`
+
+	_, err = tx.ExecContext(ctx, q)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func insertSeasonGames(g []internal.Game) error {

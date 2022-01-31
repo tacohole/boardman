@@ -75,6 +75,12 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 
 			}
 
+			plusMinus, err := calculatePlusMinus(ts)
+			if err != nil {
+				log.Fatalf("can't calculate plus/minus: %s", err)
+			}
+			ts.PlusMinus = *plusMinus
+
 			// gameStats values here
 
 			if err = insertTeamSeasonRecord(ts); err != nil {
@@ -178,7 +184,7 @@ func setMadePlayoffs(ts internal.TeamSeason) (*bool, error) {
 	var madePlayoffs bool
 
 	rows, err := db.NamedQueryContext(ctx,
-		`SELECT COUNT(*) 
+		`SELECT COUNT(*)
 		FROM games
 		WHERE season = :season
 		AND (visitor_id = :team_uuid OR home_id = :team_uuid)
@@ -217,7 +223,7 @@ func sumPsWins(ts internal.TeamSeason) (*int, error) {
 
 	// return count of games where winner = team && is_postseason = false
 	rows, err := db.NamedQueryContext(ctx,
-		`SELECT COUNT(*) 
+		`SELECT COUNT(*)
 		FROM games
 		WHERE season = :season
 		AND winner_id = :team_uuid 
@@ -252,7 +258,7 @@ func sumPsLosses(ts internal.TeamSeason) (*int, error) {
 
 	// return count of games where winner = team && is_postseason = false
 	rows, err := db.NamedQueryContext(ctx,
-		`SELECT COUNT(*) 
+		`SELECT COUNT(*)
 		FROM games
 		WHERE season = :season
 		AND (visitor_id = :team_uuid OR home_id = :team_uuid)
@@ -269,6 +275,41 @@ func sumPsLosses(ts internal.TeamSeason) (*int, error) {
 	}
 
 	return &losses, nil
+}
+
+func calculatePlusMinus(ts internal.TeamSeason) (*int, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return margin where winner = team && is_postseason = false
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT margin
+		FROM games
+		WHERE season = :season
+		AND winner_id = :team_uuid 
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var plus int // init return value
+	if err = rows.Scan(plus); err != nil {
+		return nil, err
+	}
+
+	return &plus, nil
 }
 
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {

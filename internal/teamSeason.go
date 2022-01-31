@@ -100,7 +100,6 @@ func PrepareTeamSeasonSchema() error {
 
 // get conf champ - get last game won within conf
 // get league champ - get last game won in season
-// get is_postseason for each team/year
 // sum stats by team-player, /82
 // build roster
 // build coaches
