@@ -75,11 +75,15 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 
 			}
 
-			plusMinus, err := calculatePlusMinus(ts)
+			plus, err := calculatePlus(ts)
 			if err != nil {
 				log.Fatalf("can't calculate plus/minus: %s", err)
 			}
-			ts.PlusMinus = *plusMinus
+			minus, err := calculateMinus(ts)
+			if err != nil {
+				log.Fatalf("can't calculate plus/minus: %s", err)
+			}
+			ts.PlusMinus = (*plus - *minus)
 
 			// gameStats values here
 
@@ -277,7 +281,7 @@ func sumPsLosses(ts internal.TeamSeason) (*int, error) {
 	return &losses, nil
 }
 
-func calculatePlusMinus(ts internal.TeamSeason) (*int, error) {
+func calculatePlus(ts internal.TeamSeason) (*int, error) {
 	db, err := dbutil.DbConn()
 	if err != nil {
 		return nil, err
@@ -294,7 +298,7 @@ func calculatePlusMinus(ts internal.TeamSeason) (*int, error) {
 
 	// return margin where winner = team && is_postseason = false
 	rows, err := db.NamedQueryContext(ctx,
-		`SELECT margin
+		`SELECT SUM(margin)
 		FROM games
 		WHERE season = :season
 		AND winner_id = :team_uuid 
@@ -310,6 +314,42 @@ func calculatePlusMinus(ts internal.TeamSeason) (*int, error) {
 	}
 
 	return &plus, nil
+}
+
+func calculateMinus(ts internal.TeamSeason) (*int, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return margin where winner = team && is_postseason = false
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(margin)
+		FROM games
+		WHERE season = :season
+		AND (home_id=:team_uuid OR visitor_id=team_uuid)
+		AND winner_id != :team_uuid 
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var minus int // init return value
+	if err = rows.Scan(minus); err != nil {
+		return nil, err
+	}
+
+	return &minus, nil
 }
 
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {
