@@ -87,6 +87,95 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 
 			// gameStats values here
 
+			fgm, err := sumFgm(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.FGM = *fgm
+
+			fga, err := sumFga(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.FGA = *fga
+
+			ftm, err := sumFtm(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.FTM = *ftm
+
+			fta, err := sumFta(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.FTA = *fta
+
+			fg3m, err := sumFg3m(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.FG3M = *fg3m
+
+			fg3a, err := sumFg3a(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.FG3A = *fg3a
+
+			oreb, err := sumOreb(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.OREB = *oreb
+
+			dreb, err := sumDreb(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.DREB = *dreb
+			ts.REB = (*dreb + *oreb)
+
+			ast, err := sumAst(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.AST = *ast
+
+			blk, err := sumBlk(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.BLK = *blk
+
+			stl, err := sumStl(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.STL = *stl
+
+			to, err := sumTurnovers(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.TO = *to
+
+			pf, err := sumPf(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.PF = *pf
+
+			pts, err := sumPts(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.PTS = *pts
+
+			ts.FG_PCT = (ts.FGM/ts.FGA + ts.FGM)
+			ts.FT_PCT = (ts.FTM/ts.FTA + ts.FTM)
+			ts.FG3_PCT = (ts.FG3M/ts.FG3A + ts.FG3M)
+
 			if err = insertTeamSeasonRecord(ts); err != nil {
 				log.Printf("can't insert team record: %s", err)
 			}
@@ -350,6 +439,76 @@ func calculateMinus(ts internal.TeamSeason) (*int, error) {
 	}
 
 	return &minus, nil
+}
+
+// for player in team in season sum fgm on all games
+func sumFgm(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum fga on all games
+func sumFga(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum ftm on all games
+func sumFtm(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum fta on all games
+func sumFta(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum fg3m on all games
+func sumFg3m(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum fg3a on all games
+func sumFg3a(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum Oreb on all games
+func sumOreb(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum dreb on all games
+func sumDreb(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum ast on all games
+func sumAst(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum blk on all games
+func sumBlk(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum stl on all games
+func sumStl(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum pf on all games
+func sumPf(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum turnovers on all games
+func sumTurnovers(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
+}
+
+// for player in team in season sum pts on all games
+func sumPts(ts internal.TeamSeason) (*float32, error) {
+	return nil, nil
 }
 
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {

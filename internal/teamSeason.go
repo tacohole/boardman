@@ -20,26 +20,26 @@ type TeamSeason struct {
 	ConfRank     int         `db:"conf_rank"`
 	OvrRank      int         `db:"ovr_rank"`
 	MadePlayoffs bool        `db:"made_playoffs"`
-	FGM          float32     `db:"fgm"`       // for player in team in season sum fgm on all games
-	FGA          float32     `db:"fga"`       // for player in team in season sum fga on all games
-	FTM          float32     `db:"ftm"`       // for player in team in season sum ftm on all games
-	FTA          float32     `db:"fta"`       // for player in team in season sum fta on all games
-	FG3M         float32     `db:"fg3m"`      // for player in team in season sum fg3m on all games
-	FG3A         float32     `db:"fg3a"`      // for player in team in season sum fg3a on all games
-	OREB         float32     `db:"oreb"`      // for player in team in season sum oreb on all games
-	DREB         float32     `db:"dreb"`      // for player in team in season sum dreb on all games
-	REB          float32     `db:"reb"`       // for player in team in season sum reb on all games
-	AST          float32     `db:"ast"`       // for player in team in season sum ast on all games
-	STL          float32     `db:"stl"`       // for player in team in season sum stl on all games
-	BLK          float32     `db:"blk"`       // for player in team in season sum blk on all games
-	TO           float32     `db:"turnovers"` // for player in team in season sum turnovers on all games
-	PF           float32     `db:"pf"`        // for player in team in season sum pf on all games
-	PTS          float32     `db:"pts"`       // for player in team in season sum pts on all games
-	FG_PCT       float32     `db:"fg_pct"`    // for team in season fgm / (fga+fgm)
-	FG3_PCT      float32     `db:"fg3_pct"`   // for team in season fg3m / (fg3a+fg3m)
-	FT_PCT       float32     `db:"ft_pct"`    // for team in season ftm / (fta + ftm)
-	Roster       []uuid.UUID `db:"roster"`    // select player_uuid from gamestats where season = season and teamuuid = team.uuid
-	Coaches      []uuid.UUID `db:"coaches"`   // select coach.uuid from coaches where season = season and team_uuid = team.uuid
+	FGM          float32     `db:"fgm"`
+	FGA          float32     `db:"fga"`
+	FTM          float32     `db:"ftm"`
+	FTA          float32     `db:"fta"`
+	FG3M         float32     `db:"fg3m"`
+	FG3A         float32     `db:"fg3a"`
+	OREB         float32     `db:"oreb"`
+	DREB         float32     `db:"dreb"`
+	REB          float32     `db:"reb"`
+	AST          float32     `db:"ast"`
+	STL          float32     `db:"stl"`
+	BLK          float32     `db:"blk"`
+	TO           float32     `db:"turnovers"`
+	PF           float32     `db:"pf"`
+	PTS          float32     `db:"pts"`
+	FG_PCT       float32     `db:"fg_pct"`
+	FG3_PCT      float32     `db:"fg3_pct"`
+	FT_PCT       float32     `db:"ft_pct"`
+	Roster       []uuid.UUID `db:"roster"`  // select player_uuid from gamestats where season = season and teamuuid = team.uuid
+	Coaches      []uuid.UUID `db:"coaches"` // select coach.uuid from coaches where season = season and team_uuid = team.uuid
 }
 
 func PrepareTeamSeasonSchema() error {
