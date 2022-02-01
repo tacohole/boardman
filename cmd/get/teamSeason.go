@@ -443,7 +443,39 @@ func calculateMinus(ts internal.TeamSeason) (*int, error) {
 
 // for player in team in season sum fgm on all games
 func sumFgm(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum fgm where team_uuid = ts.team_uuid and game_uuid in :season
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(fgm)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var fgm float32 // init return value
+	if err = rows.Scan(fgm); err != nil {
+		return nil, err
+	}
+
+	return &fgm, nil
 }
 
 // for player in team in season sum fga on all games
