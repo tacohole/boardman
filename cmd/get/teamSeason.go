@@ -458,11 +458,12 @@ func sumFgm(ts internal.TeamSeason) (*float32, error) {
 	defer cancel()
 
 	// return sum fgm where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
 	rows, err := db.NamedQueryContext(ctx,
 		`SELECT SUM(fgm)
 		FROM player_game_stats
 		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
-		WHERE team_uuid=:team_uuid
+		WHERE team_uuid=:team_uuid 
 		AND  games.season = :season
 		AND is_postseason = 'f'`,
 		ts)
@@ -480,67 +481,496 @@ func sumFgm(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum fga on all games
 func sumFga(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum fga where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(fga)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var fga float32 // init return value
+	if err = rows.Scan(fga); err != nil {
+		return nil, err
+	}
+
+	return &fga, nil
 }
 
 // for player in team in season sum ftm on all games
 func sumFtm(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum ftm where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(ftm)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var ftm float32 // init return value
+	if err = rows.Scan(ftm); err != nil {
+		return nil, err
+	}
+
+	return &ftm, nil
 }
 
 // for player in team in season sum fta on all games
 func sumFta(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum fta where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(fta)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var fta float32 // init return value
+	if err = rows.Scan(fta); err != nil {
+		return nil, err
+	}
+
+	return &fta, nil
 }
 
 // for player in team in season sum fg3m on all games
 func sumFg3m(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum fg3m where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(fg3m)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var fg3m float32 // init return value
+	if err = rows.Scan(fg3m); err != nil {
+		return nil, err
+	}
+
+	return &fg3m, nil
 }
 
 // for player in team in season sum fg3a on all games
 func sumFg3a(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum fgm where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(fg3a)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var fg3a float32 // init return value
+	if err = rows.Scan(fg3a); err != nil {
+		return nil, err
+	}
+
+	return &fg3a, nil
 }
 
 // for player in team in season sum Oreb on all games
 func sumOreb(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum oreb where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(oreb)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var oreb float32 // init return value
+	if err = rows.Scan(oreb); err != nil {
+		return nil, err
+	}
+
+	return &oreb, nil
 }
 
 // for player in team in season sum dreb on all games
 func sumDreb(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum fgm where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(dreb)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var dreb float32 // init return value
+	if err = rows.Scan(dreb); err != nil {
+		return nil, err
+	}
+
+	return &dreb, nil
 }
 
 // for player in team in season sum ast on all games
 func sumAst(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum ast where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(ast)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var ast float32 // init return value
+	if err = rows.Scan(ast); err != nil {
+		return nil, err
+	}
+
+	return &ast, nil
 }
 
 // for player in team in season sum blk on all games
 func sumBlk(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum blk where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(blk)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var blk float32 // init return value
+	if err = rows.Scan(blk); err != nil {
+		return nil, err
+	}
+
+	return &blk, nil
 }
 
 // for player in team in season sum stl on all games
 func sumStl(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum stl where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(stl)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var stl float32 // init return value
+	if err = rows.Scan(stl); err != nil {
+		return nil, err
+	}
+
+	return &stl, nil
 }
 
 // for player in team in season sum pf on all games
 func sumPf(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum pf where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(pf)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var pf float32 // init return value
+	if err = rows.Scan(pf); err != nil {
+		return nil, err
+	}
+
+	return &pf, nil
 }
 
 // for player in team in season sum turnovers on all games
 func sumTurnovers(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum turnovers where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(turnovers)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var to float32 // init return value
+	if err = rows.Scan(to); err != nil {
+		return nil, err
+	}
+
+	return &to, nil
 }
 
 // for player in team in season sum pts on all games
 func sumPts(ts internal.TeamSeason) (*float32, error) {
-	return nil, nil
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// return sum pts where team_uuid = ts.team_uuid and game_uuid in :season
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT SUM(pts)
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid=:team_uuid 
+		AND  games.season = :season
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var pts float32 // init return value
+	if err = rows.Scan(pts); err != nil {
+		return nil, err
+	}
+
+	return &pts, nil
 }
 
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {
