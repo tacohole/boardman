@@ -38,8 +38,8 @@ type TeamSeason struct {
 	FG_PCT       float32     `db:"fg_pct"`
 	FG3_PCT      float32     `db:"fg3_pct"`
 	FT_PCT       float32     `db:"ft_pct"`
-	Roster       []uuid.UUID `db:"roster"`  // select player_uuid from gamestats where season = season and teamuuid = team.uuid
-	Coaches      []uuid.UUID `db:"coaches"` // select coach.uuid from coaches where season = season and team_uuid = team.uuid
+	Roster       []uuid.UUID `db:"roster"`
+	Coaches      []uuid.UUID `db:"coaches"`
 }
 
 func PrepareTeamSeasonSchema() error {

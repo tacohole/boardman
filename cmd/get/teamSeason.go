@@ -176,6 +176,20 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 			ts.FT_PCT = (ts.FTM/ts.FTA + ts.FTM)
 			ts.FG3_PCT = (ts.FG3M/ts.FG3A + ts.FG3M)
 
+			// build rosters
+			roster, err := buildRoster(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.Roster = roster
+
+			// build coaches
+			coaches, err := buildCoaches(ts)
+			if err != nil {
+				log.Fatalf("%s", err)
+			}
+			ts.Coaches = coaches
+
 			if err = insertTeamSeasonRecord(ts); err != nil {
 				log.Printf("can't insert team record: %s", err)
 			}
@@ -973,6 +987,48 @@ func sumPts(ts internal.TeamSeason) (*float32, error) {
 	return &pts, nil
 }
 
+// select player_uuid from gamestats where season = season and teamuuid = team.uuid
+func buildRoster(ts internal.TeamSeason) ([]uuid.UUID, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks - might need some work
+	rows, err := db.NamedQueryContext(ctx,
+		`SELECT player_uuid
+		FROM player_game_stats
+		INNER JOIN games ON player_game_stats.game_uuid = games.uuid
+		WHERE team_uuid='a048985d-0531-46ae-b8d3-121595957f9c'
+		AND  games.season = 1989
+		AND is_postseason = 'f'`,
+		ts)
+	if err != nil {
+		return nil, err
+	}
+
+	var roster []uuid.UUID
+	if err = rows.Scan(roster); err != nil {
+		return nil, err
+	}
+
+	return roster, nil
+}
+
+// select coach.uuid from coaches where season = season and team_uuid = team.uuid
+func buildCoaches(ts internal.TeamSeason) ([]uuid.UUID, error) {
+	return nil, nil
+}
+
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
@@ -1065,6 +1121,5 @@ func insertTeamSeasonRecord(ts internal.TeamSeason) error {
 	return nil
 }
 
-// calculate +/-: sum win margin, sum loss margin, subtract win from loss
 // get conf rank - sort by wpct within conference
 // get overall rank - sort by wpct
