@@ -10,8 +10,8 @@ import (
 )
 
 var getCoachesCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets all coaches (head and assistant) since 2015",
+	Long:  "gets all coaches (head and assistant) since 2015",
 	Use:   "coaches",
 	Run:   getCoaches,
 }
@@ -101,7 +101,7 @@ func insertCoaches(c []internal.Coach) error {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO coaches (
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO coaches (
 		uuid,
 		first_name,
 		last_name,
@@ -119,7 +119,6 @@ func insertCoaches(c []internal.Coach) error {
 		:nba_team_id )`,
 		c)
 	if err != nil {
-		log.Printf("Insert failed, %s", result)
 		return err
 	}
 	if err = tx.Commit(); err != nil {

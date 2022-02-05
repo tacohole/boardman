@@ -10,8 +10,8 @@ import (
 )
 
 var getTeamsCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets basic information about NBA teams",
+	Long:  "gets name, abbreviation, conference, division, and unique IDs for 30 NBA teams",
 	Use:   "teams",
 	Run:   getTeamData,
 }
@@ -42,15 +42,16 @@ func getTeamData(cmd *cobra.Command, args []string) {
 	teamsWithIds := []internal.Team{}
 
 	for _, team := range teams {
-		team.NBA_ID, err = internal.AddNbaId(nbaIds, team)
+		nbaId, err := internal.AddNbaId(nbaIds, team)
 		if err != nil {
 			log.Fatalf("can't add NBA ids to teams: %s", err)
 		}
+		team.NBA_ID = *nbaId
 		teamsWithIds = append(teamsWithIds, team)
 	}
 
 	if err = insertTeams(teamsWithIds); err != nil {
-		log.Printf("Error inserting team: %s", err)
+		log.Fatalf("Error inserting team: %s", err)
 	}
 
 }

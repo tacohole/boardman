@@ -11,8 +11,8 @@ import (
 )
 
 var getPlayersCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets all NBA players since 1979 season",
+	Long:  "gets player name, position, height/weight, and team for all players since 1979",
 	Use:   "players",
 	Run:   getPlayers,
 }
@@ -37,7 +37,7 @@ func getPlayers(cmd *cobra.Command, args []string) {
 	}
 
 	if err := insertPlayerRows(players); err != nil {
-		log.Printf("Could not perform insert:, %s", err)
+		log.Fatalf("Could not perform insert:, %s", err)
 	}
 	if verbose {
 		log.Printf("Inserted %d players", len(players))
@@ -107,7 +107,7 @@ func insertPlayerRows(p []internal.Player) error {
 		height_feet,
 		height_in,
 		weight,
-		team_bdl_id )
+		team_bdl_id)
 		VALUES (
 			:uuid,
 			:balldontlie_id,

@@ -13,21 +13,21 @@ import (
 
 type Player struct {
 	UUID       uuid.UUID `db:"uuid"`
-	BDL_ID     int       `json:"id" db:"balldontlie_id"`
-	FirstName  string    `json:"first_name" db:"first_name"`
-	LastName   string    `json:"last_name" db:"last_name"`
-	Position   string    `json:"position" db:"position"`
-	HeightFeet int       `json:"height_feet" db:"height_feet"`
-	HeightIn   int       `json:"height_inches" db:"height_in"`
-	Weight     int       `json:"weight_pounds" db:"weight"`
+	BDL_ID     int       `db:"balldontlie_id"`
+	FirstName  string    `db:"first_name"`
+	LastName   string    `db:"last_name"`
+	Position   string    `db:"position"`
+	HeightFeet int       `db:"height_feet"`
+	HeightIn   int       `db:"height_in"`
+	Weight     int       `db:"weight"`
 	TeamUUID   uuid.UUID `db:"team_uuid"`
-	TeamBDL_ID int       `json:"team" db:"team_bdl_id"`
+	TeamBDL_ID int       `db:"team_bdl_id"`
 }
 
 const (
-	PlayerSchema = `CREATE TABLE players(
+	PlayerSchema = `CREATE TABLE IF NOT EXISTS players(
 	uuid uuid PRIMARY KEY,
-	 balldontlie_id INT,
+	balldontlie_id INT,
 	first_name TEXT,
 	last_name TEXT,
 	position TEXT,
@@ -77,6 +77,7 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 			p.TeamBDL_ID = d.Team.BDL_ID
 			allPlayers = append(allPlayers, *p)
 		}
+		// avoiding a 429
 		time.Sleep(1000 * time.Millisecond)
 	}
 	return allPlayers, nil

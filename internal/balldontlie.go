@@ -42,7 +42,7 @@ type Data struct {
 	HomeScore    int     `json:"home_team_score"`
 	Visitor      Team    `json:"visitor_team"`
 	VisitorScore int     `json:"visitor_team_score"`
-	LeagueYear   int     `json:"season"`
+	Season       int     `json:"season"`
 	IsPostseason bool    `json:"postseason"`
 	Minutes      string  `json:"min" db:"min"`
 	Game         Game    `json:"game"`

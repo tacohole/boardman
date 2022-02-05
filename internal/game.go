@@ -13,22 +13,22 @@ import (
 
 type Game struct {
 	ID           uuid.UUID `db:"uuid"`
-	BDL_ID       int       `json:"id" db:"balldontlie_id"`
-	Date         string    `json:"date" db:"date"`
+	BDL_ID       int       `db:"balldontlie_id"`
+	Date         string    `db:"date"`
 	HomeID       uuid.UUID `db:"home_id"`
-	HomeScore    int       `json:"home_team_score" db:"home_score"`
+	HomeScore    int       `db:"home_score"`
 	VisitorID    uuid.UUID `db:"visitor_id"`
-	VisitorScore int       `json:"visitor_team_score" db:"visitor_score"`
-	LeagueYear   int       `json:"season" db:"season"`
-	IsPostseason bool      `json:"postseason" db:"is_postseason"`
-	Winner       uuid.UUID `json:"winner" db:"winner_id"`
-	Margin       int       `json:"margin" db:"margin"`
+	VisitorScore int       `db:"visitor_score"`
+	Season       int       `db:"season"`
+	IsPostseason bool      `db:"is_postseason"`
+	Winner       uuid.UUID `db:"winner_id"`
+	Margin       int       `db:"margin"`
 }
 
 const (
 	GameSchema = `CREATE TABLE IF NOT EXISTS games(
 	uuid uuid PRIMARY KEY,
-	 balldontlie_id INT,
+	balldontlie_id INT,
 	date DATE,
 	home_id UUID,
 	visitor_id UUID,
@@ -95,7 +95,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 			g.HomeScore = d.HomeScore
 			g.VisitorID = *visitorId
 			g.VisitorScore = d.VisitorScore
-			g.LeagueYear = d.LeagueYear
+			g.Season = d.Season
 			g.IsPostseason = d.IsPostseason
 			g.CalculateWinnerAndMargin()
 			allGames = append(allGames, *g)

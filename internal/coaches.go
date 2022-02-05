@@ -23,7 +23,7 @@ type Coach struct {
 const (
 	CoachesSchema = `CREATE TABLE coaches(
 	uuid UUID PRIMARY KEY,
-	 first_name TEXT,
+	first_name TEXT,
 	last_name TEXT,
 	is_assistant BOOL,
 	team_uuid UUID,
@@ -61,7 +61,7 @@ func GetSeasonCoaches(season int) ([]Coach, error) {
 		c.FirstName = item.FirstName
 		c.LastName = item.LastName
 		c.IsAssistant = item.IsAssistant
-		// problem specific to the data from this endpoint: isAssistant is reversed for a few older years
+		// some crummy data here: isAssistant is reversed for a few older years
 		if season <= 2017 {
 			c.IsAssistant = !c.IsAssistant
 		}

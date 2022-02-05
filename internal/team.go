@@ -14,16 +14,16 @@ import (
 
 type Team struct {
 	UUID       uuid.UUID `db:"uuid"`
-	BDL_ID     int       `json:"id" db:"balldontlie_id"`
+	BDL_ID     int       `db:"balldontlie_id"`
 	NBA_ID     string    `db:"nba_id"`
-	Name       string    `json:"full_name" db:"name"`
-	Abbrev     string    `json:"abbreviation" db:"abbrev"`
+	Name       string    `db:"name"`
+	Abbrev     string    `db:"abbrev"`
 	Conference string    `db:"conference"`
 	Division   string    `db:"division"`
 }
 
 const (
-	TeamSchema = `CREATE TABLE teams(
+	TeamSchema = `CREATE TABLE IF NOT EXISTS teams(
 	uuid uuid PRIMARY KEY,
 	balldontlie_id INT UNIQUE,
 	nba_id TEXT,
@@ -99,15 +99,15 @@ func GetNbaIds() ([]NbaData, error) {
 	return teams, nil
 }
 
-func AddNbaId(ids []NbaData, team Team) (string, error) {
+func AddNbaId(ids []NbaData, team Team) (*string, error) {
 
 	for j := 0; j < len(ids); j++ {
 		if team.Abbrev == ids[j].Abbrev {
-			return ids[j].TeamID, nil
+			return &ids[j].TeamID, nil
 		}
 	}
 
-	return "", fmt.Errorf("no NBA ID for team %s", team.Name)
+	return nil, fmt.Errorf("no NBA ID for team %s", team.Name)
 }
 
 func GetTeamCache() ([]Team, error) {

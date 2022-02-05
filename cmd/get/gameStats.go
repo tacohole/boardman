@@ -207,7 +207,7 @@ func insertGameStats(season int) error {
 			s.GameBDL_ID = d.Game.BDL_ID
 			s.PlayerBDL_ID = d.Player.BDL_ID
 			s.TeamBDL_ID = d.Team.BDL_ID
-			s.Season = d.Game.LeagueYear
+			s.Season = d.Game.Season
 			s.AST = d.AST
 			s.BLK = d.BLK
 			s.DREB = d.DREB
