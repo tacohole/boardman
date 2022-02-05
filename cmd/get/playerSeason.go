@@ -34,13 +34,13 @@ func getPlayerSeasons(cmd *cobra.Command, args []string) {
 
 	ps := internal.PlayerSeason{}
 
+	// what to do if no stats for a player in a season
 	for _, player := range playerCache {
 		for i := 1979; i <= 2021; i++ {
 			ps.PlayerUUID = player.UUID
 			ps.Season = i
 			ps.BDL_ID = player.BDL_ID
 
-			// find values
 			gp, err := getGamesPlayed(ps)
 			if err != nil {
 				log.Fatalf("%s", err)
@@ -145,12 +145,12 @@ func getPlayerSeasons(cmd *cobra.Command, args []string) {
 			}
 			ps.PTS = *pts
 
-			// fg3_pct
-			// ft_pct
-
 			if err := insertPlayerSeasonValues(ps); err != nil {
 				log.Fatalf("can't insert player_season values: %s", err)
 			}
+
+			// reset struct for insert
+			ps = internal.PlayerSeason{}
 
 		}
 	}
