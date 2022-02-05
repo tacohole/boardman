@@ -13,6 +13,7 @@ type SingleGame struct {
 	PlayerBDL_ID int       `db:"player_bdl_id"`
 	TeamUUID     uuid.UUID `db:"team_uuid"`
 	TeamBDL_ID   int       `db:"team_bdl_id"`
+	Season       int       `db:"season"`
 	Minutes      string    `json:"min" db:"min"`
 	FGM          float32   `json:"fgm" db:"fgm"`
 	FGA          float32   `json:"fga" db:"fga"`
@@ -44,6 +45,7 @@ const (
 		team_bdl_id INT,
 		game_uuid UUID,
 		game_bdl_id INT,
+		season INT,
 		min TEXT,
 		fgm NUMERIC,
 		fga NUMERIC,

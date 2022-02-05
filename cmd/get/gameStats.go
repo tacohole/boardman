@@ -119,6 +119,7 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 		player_bdl_id,
 		team_bdl_id,
 		game_bdl_id,
+		season,
 		min,
 		fgm,
 		fga,
@@ -144,6 +145,7 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 		:player_bdl_id,
 		:team_bdl_id,
 		:game_bdl_id,
+		:season,
 		:min,
 		:fgm,
 		:fga,
@@ -205,6 +207,7 @@ func insertGameStats(season int) error {
 			s.GameBDL_ID = d.Game.BDL_ID
 			s.PlayerBDL_ID = d.Player.BDL_ID
 			s.TeamBDL_ID = d.Team.BDL_ID
+			s.Season = d.Game.LeagueYear
 			s.AST = d.AST
 			s.BLK = d.BLK
 			s.DREB = d.DREB
