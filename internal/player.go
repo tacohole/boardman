@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 
+	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
@@ -41,6 +43,33 @@ const (
 	REFERENCES teams(uuid)
 	);`
 )
+
+func GetPlayerIdCache() ([]Player, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	q := `SELECT uuid FROM players`
+	dest := &[]Player{}
+
+	if err = tx.SelectContext(ctx, dest, q); err != nil {
+		return nil, err
+	}
+
+	return *dest, nil
+}
 
 // get all players
 func (p *Player) GetAllPlayers() ([]Player, error) {

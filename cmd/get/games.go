@@ -10,8 +10,8 @@ import (
 )
 
 var getGamesCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets basic info on all games since 1979",
+	Long:  "gets teams, date, score, and season stage for all games since 1979",
 	Use:   "games",
 	Run:   getGames,
 }
@@ -36,7 +36,7 @@ func getGames(cmd *cobra.Command, args []string) {
 		}
 
 		if err = insertSeasonGames(games); err != nil {
-			log.Printf("can't insert games for season %d: %s", i, err)
+			log.Fatalf("can't insert games for season %d: %s", i, err)
 		}
 	}
 

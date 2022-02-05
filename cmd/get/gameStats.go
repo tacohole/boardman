@@ -17,8 +17,8 @@ import (
 
 // no queries just paginate
 var getGameStatsCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets detailed box score stats on game stats by player for all games since 1979",
+	Long:  "gets detailed box score stats on game stats by player for all games since 1979",
 	Use:   "games-stats",
 	Run:   getGameStats,
 }
@@ -170,8 +170,7 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 		return err
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		return err
 	}
 

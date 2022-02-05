@@ -7,11 +7,13 @@ import (
 type PlayerSeason struct {
 	PlayerUUID  uuid.UUID `db:"uuid"`
 	BDL_ID      int       `db:"balldontlie_id"`
-	LeagueYear  int       `db:"season"`
+	Season      int       `db:"season"`
 	GamesPlayed int       `db:"games_played"`
 	Minutes     string    `db:"avg_min"`
 	FGM         float32   `db:"fgm"`
 	FGA         float32   `db:"fga"`
+	FTM         float32   `db:"ftm"`
+	FTA         float32   `db:"fta"`
 	FG3M        float32   `db:"fg3m"`
 	FG3A        float32   `db:"fg3a"`
 	OREB        float32   `db:"oreb"`
@@ -36,6 +38,8 @@ const (
 		avg_min TEXT,
 		fgm NUMERIC(4),
 		fga NUMERIC(4),
+		ftm NUMERIC(4),
+		fta NUMERIC(4),
 		fg3m NUMERIC(4),
 		fg3a NUMERIC(4),
 		oreb NUMERIC(4),
