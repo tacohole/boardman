@@ -181,13 +181,20 @@ func insertGameStats(season int) error {
 	var s internal.SingleGame
 	var games []internal.SingleGame // init return value
 	var page internal.Page
+	var errorCount int
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
 		getUrl := internal.BDLUrl + internal.BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
-			return err
+			errorCount++
+			if errorCount > 2 {
+				return err
+			} else {
+				pageIndex--
+				continue
+			}
 		}
 		defer resp.Body.Close()
 
