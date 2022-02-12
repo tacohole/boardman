@@ -59,18 +59,32 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 	fmt.Print(teamCache)
 
 	var page Page
+	var errorCount int
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
 		getUrl := BDLUrl + BDLGames + "?seasons[]=" + fmt.Sprint(season) + "&amp;page=" + fmt.Sprint(pageIndex) + "per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
-			return nil, err
+			errorCount++
+			if errorCount > 2 {
+				return nil, err
+			} else {
+				pageIndex--
+				continue
+			}
+
 		}
 		defer resp.Body.Close()
 
 		r, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			errorCount++
+			if errorCount > 2 {
+				return nil, err
+			} else {
+				pageIndex--
+				continue
+			}
 		}
 
 		err = json.Unmarshal(r, &page)
