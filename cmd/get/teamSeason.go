@@ -11,8 +11,8 @@ import (
 )
 
 var getTeamSeasonCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "calculates team stats for all seasons in database",
+	Long:  "calculates regular season stats for all teams/seasons, along with rosters and coaches",
 	Use:   "team-season",
 	Run:   getTeamSeasons,
 }
@@ -1042,7 +1042,7 @@ func buildCoaches(ts internal.TeamSeason) ([]uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks - might need some work
+	// a048985d-0531-46ae-b8d3-121595957f9c - Hawks
 	rows, err := db.NamedQueryContext(ctx,
 		`SELECT uuid
 		FROM coaches

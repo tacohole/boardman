@@ -56,6 +56,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Print(teamCache)
 
 	var page Page
 

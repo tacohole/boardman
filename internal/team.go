@@ -14,12 +14,12 @@ import (
 
 type Team struct {
 	UUID       uuid.UUID `db:"uuid"`
-	BDL_ID     int       `db:"balldontlie_id"`
-	NBA_ID     string    `db:"nba_id"`
-	Name       string    `db:"name"`
-	Abbrev     string    `db:"abbrev"`
-	Conference string    `db:"conference"`
-	Division   string    `db:"division"`
+	BDL_ID     int       `json:"id" db:"balldontlie_id"`
+	NBA_ID     string    `json:"teamId" db:"nba_id"`
+	Name       string    `json:"full_name" db:"name"`
+	Abbrev     string    `json:"abbreviation" db:"abbrev"`
+	Conference string    `json:"conference" db:"conference"`
+	Division   string    `json:"divsion" db:"division"`
 }
 
 const (
@@ -127,7 +127,7 @@ func GetTeamCache() ([]Team, error) {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	q := `SELECT * FROM teams`
+	q := `SELECT uuid,balldontlie_id FROM teams`
 	dest := &[]Team{}
 
 	if err = tx.SelectContext(ctx, dest, q); err != nil {
