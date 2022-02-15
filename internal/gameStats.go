@@ -36,7 +36,7 @@ type SingleGame struct {
 }
 
 const (
-	GameStatsSchema = `CREATE TABLE player_game_stats(
+	GameStatsSchema = `CREATE TABLE IF NOT EXISTS player_game_stats(
 		uuid UUID PRIMARY KEY,
 		balldontlie_id INT,
 		player_uuid UUID,

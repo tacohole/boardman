@@ -13,14 +13,14 @@ import (
 
 type Game struct {
 	ID           uuid.UUID `db:"uuid"`
-	BDL_ID       int       `db:"balldontlie_id"`
-	Date         string    `db:"date"`
+	BDL_ID       int       `json:"id" db:"balldontlie_id"`
+	Date         string    `json:"date" db:"date"`
 	HomeID       uuid.UUID `db:"home_id"`
-	HomeScore    int       `db:"home_score"`
+	HomeScore    int       `json:"home_team_score" db:"home_score"`
 	VisitorID    uuid.UUID `db:"visitor_id"`
-	VisitorScore int       `db:"visitor_score"`
-	Season       int       `db:"season"`
-	IsPostseason bool      `db:"is_postseason"`
+	VisitorScore int       `json:"visitor_team_score" db:"visitor_score"`
+	Season       int       `json:"season" db:"season"`
+	IsPostseason bool      `json:"postseason" db:"is_postseason"`
 	Winner       uuid.UUID `db:"winner_id"`
 	Margin       int       `db:"margin"`
 }
