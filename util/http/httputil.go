@@ -7,12 +7,7 @@ import (
 )
 
 const (
-	BaseUrl     = "https://balldontlie.io/api/v1/"
-	Players     = "players"
-	Teams       = "teams"
-	Games       = "games/"
-	Stats       = "stats/"
-	httpTimeout = 300 * time.Second
+	httpTimeout = 15 * time.Second
 )
 
 func MakeHttpRequest(method string, url string) (*http.Response, error) {
@@ -26,7 +21,8 @@ func MakeHttpRequest(method string, url string) (*http.Response, error) {
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	fmt.Printf("Sending request to %s\n", url)
+
+	fmt.Printf("sending request to %s \n", url)
 
 	response, err := client.Do(request)
 	if err != nil || response.StatusCode >= 400 {

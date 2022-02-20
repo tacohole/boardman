@@ -1,2 +1,0 @@
-ID,Name,SourceId,SchemaId,ContentType,DefaultPageSize,PageIndexVar,NextPageVar
-1,balldontlie-players,1,1,"application/json",25,"current_page","next_page"

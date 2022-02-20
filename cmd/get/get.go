@@ -13,9 +13,7 @@ var GetCmd = &cobra.Command{
 }
 
 var verbose bool
-var writeTo string
 
 func loadDefaultVariables() {
 	verbose = viper.GetBool("verbose")
-	writeTo = viper.GetString("writeTo")
 }

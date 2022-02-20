@@ -2,19 +2,16 @@ package get
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
-	schema "github.com/tacohole/boardman/internal"
+	internal "github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
 var getTeamsCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets basic information about NBA teams",
+	Long:  "gets name, abbreviation, conference, division, and unique IDs for 30 NBA teams",
 	Use:   "teams",
 	Run:   getTeamData,
 }
@@ -25,32 +22,50 @@ func init() {
 
 func getTeamData(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
-	godotenv.Load(".env")
 
-	team := schema.Team{}
+	err := dbutil.PrepareSchema(internal.TeamSchema)
+	if err != nil {
+		log.Fatalf("can't create teams schema: %s", err)
+	}
+
+	team := internal.Team{}
 
 	teams, err := team.GetAllTeams()
 	if err != nil {
 		log.Fatalf("can't get teams: %s", err)
 	}
 
-	result, err := insertTeams(teams)
+	nbaIds, err := internal.GetNbaIds()
 	if err != nil {
-		log.Printf("Error inserting team: %s", err)
+		log.Fatalf("can't get NBA teamIDs: %s", err)
 	}
-	log.Printf("Inserted %s", fmt.Sprint(result))
+	teamsWithIds := []internal.Team{}
+
+	for _, team := range teams {
+		nbaId, err := internal.AddNbaId(nbaIds, team)
+		if err != nil {
+			log.Fatalf("can't add NBA ids to teams: %s", err)
+		}
+		team.NBA_ID = *nbaId
+		teamsWithIds = append(teamsWithIds, team)
+	}
+
+	if err = insertTeams(teamsWithIds); err != nil {
+		log.Fatalf("Error inserting team: %s", err)
+	}
 
 }
 
-func insertTeams(t []schema.Team) (*sql.Result, error) {
+func insertTeams(t []internal.Team) error {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return nil, err
+		return err
 	}
+	defer db.Close()
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -59,24 +74,28 @@ func insertTeams(t []schema.Team) (*sql.Result, error) {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO teams (
-		id, 
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO teams (
+		uuid,
+		balldontlie_id,
+		nba_id,
 		name, 
 		abbrev, 
 		conference, 
 		division) 
 		VALUES (
-			:id, 
+			:uuid,
+			:balldontlie_id,
+			:nba_id,
 			:name,
 			:abbrev, 
 			:conference, 
 			:division)`,
 		t)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	tx.Commit()
 
-	return &result, nil
+	return nil
 
 }

@@ -17,28 +17,25 @@ package root
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	genConfig "github.com/tacohole/boardman/cmd/config"
-	"github.com/tacohole/boardman/cmd/get"
-	"github.com/tacohole/boardman/util/config"
-
-	"github.com/spf13/viper"
+	get "github.com/tacohole/boardman/cmd/get"
 )
 
-var (
-	cfgFile   string
-	dbTimeout time.Duration
-	verbose   bool
-)
+var verbose bool
+
+// var (
+// 	// cfgFile   string
+// 	// dbTimeout time.Duration
+// )
 
 // rootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "boardman",
-	Short: "A data normalization client for REST APIs",
+	Short: "A data loader for NBA player/team stats",
 	Long:  ``,
 }
 
@@ -54,9 +51,9 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", config.ConfigPath+config.ConfigFileName))
-	RootCmd.PersistentFlags().DurationVar(&dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
-	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, fmt.Sprintln("Include additional logging information"))
+	// RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", config.ConfigPath+config.ConfigFileName))
+	// RootCmd.PersistentFlags().DurationVar(&dbTimeout, "dbTimeout", 60*time.Second, "database timeout default is 60s, use 60m for minutes or 60h for hours")
+	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", true, fmt.Sprintln("Include additional logging information"))
 
 	RootCmd.AddCommand(get.GetCmd)
 	RootCmd.AddCommand(genConfig.ConfigCmd)
@@ -64,26 +61,28 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.SetDefault(config.DbUrlEnvironmentName, "postgresql://user:secret@localhost:5432")
+	godotenv.Load("boardman-config.env")
 
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Search config in config path with name ".boardman" (without extension).
-		viper.AddConfigPath(config.ConfigPath)
-		viper.SetConfigName(config.ConfigFileNameNoExtension)
-	}
+	// viper.SetDefault(config.DbUrlEnvironmentName, "postgresql://user:secret@localhost:5432")
 
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-	} else {
-		fmt.Printf("There was a problem with config file %s and it has been ignored: %s", cfgFile, err)
-	}
+	// if cfgFile != "" {
+	// 	// Use config file from the flag.
+	// 	viper.SetConfigFile(cfgFile)
+	// } else {
+	// 	// Search config in config path with name ".boardman" (without extension).
+	// 	viper.AddConfigPath(config.ConfigPath)
+	// 	viper.SetConfigName(config.ConfigFileNameNoExtension)
+	// }
 
-	if err := viper.BindPFlag("verbose", RootCmd.Flags().Lookup("verbose")); err != nil {
-		log.Println(err.Error())
-	}
+	// // If a config file is found, read it in.
+	// if err := viper.ReadInConfig(); err == nil {
+	// 	fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	// } else {
+	// 	fmt.Printf("There was a problem with config file %s and it has been ignored: %s", cfgFile, err)
+	// }
+
+	// if err := viper.BindPFlag("verbose", RootCmd.Flags().Lookup("verbose")); err != nil {
+	// 	log.Println(err.Error())
+	// }
 
 }

@@ -1,49 +1,44 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 
+	"github.com/google/uuid"
+	dbutil "github.com/tacohole/boardman/util/db"
 	httpHelpers "github.com/tacohole/boardman/util/http"
 )
 
 type Team struct {
-	ID         int    `json:"id"`
-	Name       string `json:"full_name"`
-	Abbrev     string `json:"abbreviation"`
-	Conference string `json:"conference"`
-	Division   string `json:"division"`
+	UUID       uuid.UUID `db:"uuid"`
+	BDL_ID     int       `json:"id" db:"balldontlie_id"`
+	NBA_ID     string    `json:"teamId" db:"nba_id"`
+	Name       string    `json:"full_name" db:"name"`
+	Abbrev     string    `json:"abbreviation" db:"abbrev"`
+	Conference string    `json:"conference" db:"conference"`
+	Division   string    `json:"divsion" db:"division"`
 }
 
-// get team by ID
-func (t *Team) GetTeamById() (*Team, error) {
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Teams + fmt.Sprint(t.ID)
-
-	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	r, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(r, &t)
-	if err != nil {
-		return nil, err
-	}
-
-	return t, nil
-}
+const (
+	TeamSchema = `CREATE TABLE IF NOT EXISTS teams(
+	uuid uuid PRIMARY KEY,
+	balldontlie_id INT UNIQUE,
+	nba_id TEXT,
+	name TEXT,
+	abbrev TEXT,
+	conference TEXT,
+	division TEXT
+	); `
+)
 
 // get all teams
 func (t *Team) GetAllTeams() ([]Team, error) {
 	allTeams := []Team{}
 
-	getUrl := httpHelpers.BaseUrl + httpHelpers.Teams
+	getUrl := BDLUrl + BDLTeams
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
@@ -62,7 +57,8 @@ func (t *Team) GetAllTeams() ([]Team, error) {
 		return nil, err
 	}
 	for _, d := range p.Data {
-		t.ID = d.ID
+		t.UUID = uuid.New()
+		t.BDL_ID = d.ID
 		t.Abbrev = d.Abbrev
 		t.Conference = d.Conference
 		t.Name = d.Name
@@ -73,69 +69,70 @@ func (t *Team) GetAllTeams() ([]Team, error) {
 	return allTeams, nil
 }
 
-// // get all teams in conf - move to Presti, can't query this endpoint
-// func (t *Team) GetConfTeams(conf string) ([]Team, error) {
-// 	confTeams := []Team{}
+func GetNbaIds() ([]NbaData, error) {
+	getUrl := NbaDataUrl + fmt.Sprint(2021) + Teams
 
-// 	getUrl := httpHelpers.BaseUrl + httpHelpers.Teams + "?conference=" + conf
+	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
-// 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer resp.Body.Close()
+	r, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
-// 	r, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var p Page
+	var page NbaPage
+	var teams []NbaData
+	var t NbaData
+	if err = json.Unmarshal(r, &page); err != nil {
+		return nil, err
+	}
 
-// 	err = json.Unmarshal(r, &p)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	for _, d := range p.Data {
-// 		t.ID = d.ID
-// 		t.Abbrev = d.Abbrev
-// 		t.Conference = d.Conference
-// 		t.Name = d.Name
-// 		t.Division = d.Division
-// 		confTeams = append(confTeams, *t)
-// 	}
+	for _, item := range page.League.Standard {
+		t.TeamID = item.TeamID
+		t.Name = item.Name
+		t.Abbrev = item.Abbrev
+		teams = append(teams, t)
+	}
+	return teams, nil
+}
 
-// 	return confTeams, nil
-// }
+func AddNbaId(ids []NbaData, team Team) (*string, error) {
 
-// // get all teams in div - move to Presti, can't query this endpoint
-// func (t *Team) GetDivTeams() ([]Team, error) {
-// 	divTeams := []Team{}
+	for j := 0; j < len(ids); j++ {
+		if team.Abbrev == ids[j].Abbrev {
+			return &ids[j].TeamID, nil
+		}
+	}
 
-// 	getUrl := httpHelpers.BaseUrl + httpHelpers.Teams +
+	return nil, fmt.Errorf("no NBA ID for team %s", team.Name)
+}
 
-// 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl, []byte(""), "")
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer resp.Body.Close()
+func GetTeamCache() ([]Team, error) {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return nil, err
+	}
 
-// 	r, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var p Page
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return nil, err
+	}
 
-// 	err = json.Unmarshal(r, &p)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	for _, d := range p.Data {
-// 		t.ID = d.ID
-// 		t.Abbrev = d.Abbrev
-// 		t.Conference = d.Conference
-// 		t.Name = d.Name
-// 		t.Division = d.Division
-// 		divTeams = append(divTeams, *t)
-// 	}
-// 	return divTeams, nil
-// }
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	q := `SELECT uuid,balldontlie_id FROM teams`
+	dest := &[]Team{}
+
+	if err = tx.SelectContext(ctx, dest, q); err != nil {
+		return nil, err
+	}
+
+	return *dest, nil
+}

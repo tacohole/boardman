@@ -2,19 +2,16 @@ package get
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
-	schema "github.com/tacohole/boardman/internal"
+	"github.com/tacohole/boardman/internal"
 	dbutil "github.com/tacohole/boardman/util/db"
 )
 
 var getGamesCmd = &cobra.Command{
-	Short: "",
-	Long:  "",
+	Short: "gets basic info on all games since 1979",
+	Long:  "gets teams, date, score, and season stage for all games since 1979",
 	Use:   "games",
 	Run:   getGames,
 }
@@ -25,35 +22,40 @@ func init() {
 
 func getGames(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
-	godotenv.Load(".env")
 
-	g := schema.Game{}
-	seasons := []int{1981: 2021}
+	g := internal.Game{}
 
-	for _, season := range seasons {
-		games, err := g.GetSeasonGames(season)
+	if err := dbutil.PrepareSchema(internal.GameSchema); err != nil {
+		log.Fatalf("could not create games schema: %s", err)
+	}
+
+	for i := 1979; i <= 2021; i++ {
+		games, err := g.GetSeasonGames(i)
 		if err != nil {
 			log.Fatalf("can't get games: %s", err)
 		}
 
-		result, err := insertSeasonGames(games)
-		if err != nil {
-			log.Printf("can't get games for season %d: %s", season, err)
+		if err = insertSeasonGames(games); err != nil {
+			log.Fatalf("can't insert games for season %d: %s", i, err)
 		}
-		log.Print(fmt.Sprint(result))
+	}
+
+	if err := cleanupDuplicateGames(); err != nil {
+		log.Printf("can't remove duplicate values from games: %s", err)
 	}
 
 }
 
-func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
+func cleanupDuplicateGames() error {
 	db, err := dbutil.DbConn()
 	if err != nil {
-		return nil, err
+		return err
 	}
+	defer db.Close()
 
 	timeout, err := dbutil.GenerateTimeout()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -62,36 +64,70 @@ func insertSeasonGames(g []schema.Game) (*sql.Result, error) {
 	tx := db.MustBegin()
 	defer tx.Rollback()
 
-	result, err := tx.NamedExecContext(ctx, `INSERT INTO games (
-		id, 
+	q := `DELETE FROM games a 
+		USING games b 
+		WHERE a.uuid < b.uuid 
+		AND a.balldontlie_id = b.balldontlie_id;`
+
+	_, err = tx.ExecContext(ctx, q)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertSeasonGames(g []internal.Game) error {
+	db, err := dbutil.DbConn()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	timeout, err := dbutil.GenerateTimeout()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+
+	tx := db.MustBegin()
+	defer tx.Rollback()
+
+	_, err = tx.NamedExecContext(ctx, `INSERT INTO games (
+		uuid,
+		balldontlie_id,
 		date,
 		home_id, 
-		home_team_score, 
+		home_score, 
 		visitor_id, 
-		visitor_team_score, 
+		visitor_score, 
 		season, 
-		postseason, 
-		winner, 
-		margin, 
+		is_postseason, 
+		winner_id, 
+		margin 
 	) VALUES (
+		:uuid,
+		:balldontlie_id,
 		:date,
 		:home_id, 
-		:home_team_score, 
+		:home_score, 
 		:visitor_id, 
-		:visitor_team_score, 
+		:visitor_score, 
 		:season, 
-		:postseason, 
-		:winner, 
-		:margin, )`,
+		:is_postseason, 
+		:winner_id, 
+		:margin )`,
 		g)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	err = tx.Commit()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &result, nil
+	return nil
 
 }
