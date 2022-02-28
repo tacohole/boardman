@@ -36,8 +36,19 @@ func getGameStats(cmd *cobra.Command, args []string) {
 
 	for i := 1979; i <= 2021; i++ {
 
-		if err := insertGameStats(i); err != nil {
-			log.Fatalf("can't get stats for season %d: %s", i, err)
+		page, err := getGameStatsPage(i)
+		if err != nil {
+			log.Fatalf("can't get game stats page for %d: %s", i, err)
+		}
+		time.Sleep(1 * time.Second)
+
+		gameStats, err := gameStatsPagetoStruct(*page)
+		if err != nil {
+			log.Fatalf("can't convert game stats page to struct: %s", err)
+		}
+
+		if err := insertGameStatsPage(gameStats); err != nil {
+			log.Fatalf("can't insert stats for season %d: %s", i, err)
 		}
 
 	}
@@ -177,9 +188,44 @@ func insertGameStatsPage(stats []internal.SingleGame) error {
 	return nil
 }
 
-func insertGameStats(season int) error {
+func gameStatsPagetoStruct(page internal.Page) ([]internal.SingleGame, error) {
 	var s internal.SingleGame
-	var games []internal.SingleGame // init return value
+	var games []internal.SingleGame
+
+	for _, d := range page.Data {
+		s.UUID = uuid.New()
+		s.BDL_ID = d.ID
+		s.GameBDL_ID = d.Game.BDL_ID
+		s.PlayerBDL_ID = d.Player.BDL_ID
+		s.TeamBDL_ID = d.Team.BDL_ID
+		s.Season = d.Game.Season
+		s.AST = d.AST
+		s.BLK = d.BLK
+		s.DREB = d.DREB
+		s.FG3A = d.FG3A
+		s.FG3M = d.FG3M
+		s.FG3_PCT = d.FG3_PCT
+		s.FGA = d.FGA
+		s.FGM = d.FGM
+		s.FG_PCT = d.FG_PCT
+		s.FTA = d.FTA
+		s.FTM = d.FTM
+		s.FT_PCT = d.FT_PCT
+		s.Minutes = d.Minutes
+		s.OREB = d.OREB
+		s.PF = d.OREB
+		s.PF = d.PF
+		s.PTS = d.PTS
+		s.REB = d.REB
+		s.STL = d.STL
+		s.TO = d.TO
+		games = append(games, s)
+	}
+
+	return games, nil
+}
+
+func getGameStatsPage(season int) (*internal.Page, error) {
 	var page internal.Page
 	var errorCount int
 
@@ -190,7 +236,7 @@ func insertGameStats(season int) error {
 		if err != nil {
 			errorCount++
 			if errorCount > 2 {
-				return err
+				return nil, err
 			} else {
 				pageIndex--
 				continue
@@ -200,52 +246,15 @@ func insertGameStats(season int) error {
 
 		r, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if err = json.Unmarshal(r, &page); err != nil {
-			return err
+			return nil, err
 		}
 
-		for _, d := range page.Data {
-			s.UUID = uuid.New()
-			s.BDL_ID = d.ID
-			s.GameBDL_ID = d.Game.BDL_ID
-			s.PlayerBDL_ID = d.Player.BDL_ID
-			s.TeamBDL_ID = d.Team.BDL_ID
-			s.Season = d.Game.Season
-			s.AST = d.AST
-			s.BLK = d.BLK
-			s.DREB = d.DREB
-			s.FG3A = d.FG3A
-			s.FG3M = d.FG3M
-			s.FG3_PCT = d.FG3_PCT
-			s.FGA = d.FGA
-			s.FGM = d.FGM
-			s.FG_PCT = d.FG_PCT
-			s.FTA = d.FTA
-			s.FTM = d.FTM
-			s.FT_PCT = d.FT_PCT
-			s.Minutes = d.Minutes
-			s.OREB = d.OREB
-			s.PF = d.OREB
-			s.PF = d.PF
-			s.PTS = d.PTS
-			s.REB = d.REB
-			s.STL = d.STL
-			s.TO = d.TO
-			games = append(games, s)
-		}
-		if err := insertGameStatsPage(games); err != nil {
-			return fmt.Errorf("can't insert games: %s", err)
-		}
-		// reset the value to add to the db
-		games = []internal.SingleGame{}
-
-		time.Sleep(1000 * time.Millisecond)
 	}
-
-	return nil
+	return &page, nil
 }
 
 func updateGamesWithPlayerIds() (int64, error) {

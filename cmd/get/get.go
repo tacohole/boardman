@@ -15,5 +15,5 @@ var GetCmd = &cobra.Command{
 var verbose bool
 
 func loadDefaultVariables() {
-	verbose = viper.GetBool("verbose")
+	verbose = viper.GetBool("VERBOSE")
 }
