@@ -36,19 +36,8 @@ func getGameStats(cmd *cobra.Command, args []string) {
 
 	for i := 1979; i <= 2021; i++ {
 
-		page, err := getGameStatsPage(i)
-		if err != nil {
+		if err := getGameStatsPage(i); err != nil {
 			log.Fatalf("can't get game stats page for %d: %s", i, err)
-		}
-		time.Sleep(1 * time.Second)
-
-		gameStats, err := gameStatsPagetoStruct(*page)
-		if err != nil {
-			log.Fatalf("can't convert game stats page to struct: %s", err)
-		}
-
-		if err := insertGameStatsPage(gameStats); err != nil {
-			log.Fatalf("can't insert stats for season %d: %s", i, err)
 		}
 
 	}
@@ -225,7 +214,7 @@ func gameStatsPagetoStruct(page internal.Page) ([]internal.SingleGame, error) {
 	return games, nil
 }
 
-func getGameStatsPage(season int) (*internal.Page, error) {
+func getGameStatsPage(season int) error {
 	var page internal.Page
 	var errorCount int
 
@@ -236,7 +225,7 @@ func getGameStatsPage(season int) (*internal.Page, error) {
 		if err != nil {
 			errorCount++
 			if errorCount > 2 {
-				return nil, err
+				return err
 			} else {
 				pageIndex--
 				continue
@@ -246,15 +235,24 @@ func getGameStatsPage(season int) (*internal.Page, error) {
 
 		r, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		if err = json.Unmarshal(r, &page); err != nil {
-			return nil, err
+			return err
 		}
 
+		gameStats, err := gameStatsPagetoStruct(page)
+		if err != nil {
+			return fmt.Errorf("can't convert game stats page to struct: %s", err)
+		}
+
+		if err := insertGameStatsPage(gameStats); err != nil {
+			return fmt.Errorf("can't insert stats: %s", err)
+		}
+		time.Sleep(1 * time.Second)
 	}
-	return &page, nil
+	return nil
 }
 
 func updateGamesWithPlayerIds() (int64, error) {
