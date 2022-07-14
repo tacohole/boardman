@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/google/uuid"
 	httpHelpers "github.com/tacohole/boardman/util/http"
@@ -40,7 +41,13 @@ func GetSeasonCoaches(season int) ([]Coach, error) {
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
-		return nil, err
+		if resp.StatusCode == 429 {
+			fmt.Printf("hit a rate limit, nite nite")
+			time.Sleep(3000)
+			return nil, err
+		} else {
+			return nil, err
+		}
 	}
 	defer resp.Body.Close()
 

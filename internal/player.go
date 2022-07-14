@@ -81,7 +81,13 @@ func (p *Player) GetAllPlayers() ([]Player, error) {
 		getUrl := BDLUrl + BDLPlayers + "/?page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
-			return nil, err
+			if resp.StatusCode == 429 {
+				fmt.Printf("hit a rate limit, nite nite")
+				time.Sleep(3000)
+				return nil, err
+			} else {
+				return nil, err
+			}
 		}
 		defer resp.Body.Close()
 

@@ -216,19 +216,18 @@ func gameStatsPagetoStruct(page internal.Page) ([]internal.SingleGame, error) {
 
 func getGameStatsPage(season int) error {
 	var page internal.Page
-	var errorCount int
 
 	for pageIndex := 0; pageIndex <= page.PageData.TotalPages; pageIndex++ {
 		getUrl := internal.BDLUrl + internal.BDLStats + "?seasons[]=" + fmt.Sprint(season) + "&page=" + fmt.Sprint(pageIndex) + "&per_page=100"
 
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
-			errorCount++
-			if errorCount > 2 {
+			if resp.StatusCode == 429 {
+				fmt.Printf("hit a rate limit, nite nite")
+				time.Sleep(3000)
 				return err
 			} else {
-				pageIndex--
-				continue
+				return err
 			}
 		}
 		defer resp.Body.Close()

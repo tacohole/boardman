@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"time"
 
 	"github.com/google/uuid"
 	dbutil "github.com/tacohole/boardman/util/db"
@@ -74,7 +75,13 @@ func GetNbaIds() ([]NbaData, error) {
 
 	resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 	if err != nil {
-		return nil, err
+		if resp.StatusCode == 429 {
+			fmt.Printf("hit a rate limit, nite nite")
+			time.Sleep(3000)
+			return nil, err
+		} else {
+			return nil, err
+		}
 	}
 	defer resp.Body.Close()
 

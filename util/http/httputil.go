@@ -25,8 +25,8 @@ func MakeHttpRequest(method string, url string) (*http.Response, error) {
 	fmt.Printf("sending request to %s \n", url)
 
 	response, err := client.Do(request)
-	if err != nil || response.StatusCode >= 400 {
-		return nil, fmt.Errorf("%s request to %s failed: %d", method, url, response.StatusCode)
+	if err != nil {
+		return response, fmt.Errorf("%s request to %s failed: %d", method, url, response.StatusCode)
 	}
 	return response, nil
 }

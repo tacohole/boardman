@@ -65,14 +65,13 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 		getUrl := BDLUrl + BDLGames + "?seasons[]=" + fmt.Sprint(season) + "&amp;page=" + fmt.Sprint(pageIndex) + "per_page=100"
 		resp, err := httpHelpers.MakeHttpRequest("GET", getUrl)
 		if err != nil {
-			errorCount++
-			if errorCount > 2 {
+			if resp.StatusCode == 429 {
+				fmt.Printf("hit a rate limit, nite nite")
+				time.Sleep(3000)
 				return nil, err
 			} else {
-				pageIndex--
-				continue
+				return nil, err
 			}
-
 		}
 		defer resp.Body.Close()
 
