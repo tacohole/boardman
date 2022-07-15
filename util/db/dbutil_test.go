@@ -37,24 +37,6 @@ func TestDbConn(t *testing.T) {
 	after(false)
 }
 
-func TestDbConnWithName(t *testing.T) {
-	before()
-
-	testDb, err := dbutil.DbConn(TEST_DB_NAME)
-	if err != nil {
-		log.Printf("%v", err)
-		t.Fail()
-	}
-	proxy := &sqlx.DB{}
-
-	if reflect.TypeOf(testDb) != reflect.TypeOf(proxy) {
-		log.Printf("%v", reflect.TypeOf(testDb))
-		t.Fail()
-		after(true)
-	}
-	after(true)
-}
-
 func TestGenerateTimeout(t *testing.T) {
 	before()
 
@@ -75,7 +57,7 @@ func TestGenerateTimeout(t *testing.T) {
 }
 
 // test db create
-func TestPrepareValidSchema(t *testing.T) {
+func TestPrepareSchema(t *testing.T) {
 	before()
 
 	schema := fmt.Sprintf("CREATE DATABASE %s", TEST_DB_NAME)
