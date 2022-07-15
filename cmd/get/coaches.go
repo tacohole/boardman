@@ -23,7 +23,7 @@ func init() {
 func getCoaches(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	if err := dbutil.PrepareSchema(internal.CoachesSchema); err != nil {
+	if err := dbutil.PrepareSchema(internal.CoachesSchema, "nba_data"); err != nil {
 		log.Fatalf("can't prepare coaches schema, %s", err)
 	}
 
@@ -56,7 +56,7 @@ func getCoaches(cmd *cobra.Command, args []string) {
 }
 
 func updateCoachesWithTeamIds() (int64, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return 0, err
 	}
@@ -84,7 +84,7 @@ func updateCoachesWithTeamIds() (int64, error) {
 }
 
 func insertCoaches(c []internal.Coach) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}

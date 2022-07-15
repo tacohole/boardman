@@ -80,7 +80,7 @@ func PrepareTeamSeasonSchema() error {
 	FOREIGN KEY(team_uuid)
 	REFERENCES teams(uuid));`
 
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}

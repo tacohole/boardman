@@ -56,7 +56,6 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Print(teamCache)
 
 	var page Page
 	var errorCount int
@@ -67,7 +66,7 @@ func (g *Game) GetSeasonGames(season int) ([]Game, error) {
 		if err != nil {
 			if resp.StatusCode == 429 {
 				fmt.Printf("hit a rate limit, nite nite")
-				time.Sleep(3000)
+				time.Sleep(60 * time.Second)
 				return nil, err
 			} else {
 				return nil, err

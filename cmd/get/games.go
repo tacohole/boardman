@@ -25,7 +25,7 @@ func getGames(cmd *cobra.Command, args []string) {
 
 	g := internal.Game{}
 
-	if err := dbutil.PrepareSchema(internal.GameSchema); err != nil {
+	if err := dbutil.PrepareSchema(internal.GameSchema, "nba_data"); err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 
@@ -47,7 +47,7 @@ func getGames(cmd *cobra.Command, args []string) {
 }
 
 func cleanupDuplicateGames() error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func cleanupDuplicateGames() error {
 }
 
 func insertSeasonGames(g []internal.Game) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}

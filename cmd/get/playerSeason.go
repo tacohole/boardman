@@ -23,7 +23,7 @@ func init() {
 func getPlayerSeasons(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	if err := dbutil.PrepareSchema(internal.PlayerSeasonSchema); err != nil {
+	if err := dbutil.PrepareSchema(internal.PlayerSeasonSchema, "nba_data"); err != nil {
 		log.Fatalf("can't prepare player_season schema: %s", err)
 	}
 
@@ -224,7 +224,7 @@ func getPts(ps internal.PlayerSeason) (*float32, error) {
 }
 
 func insertPlayerSeasonValues(ps internal.PlayerSeason) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}

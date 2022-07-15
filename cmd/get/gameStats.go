@@ -30,7 +30,7 @@ func init() {
 func getGameStats(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	if err := dbutil.PrepareSchema(internal.GameStatsSchema); err != nil {
+	if err := dbutil.PrepareSchema(internal.GameStatsSchema, "nba_data"); err != nil {
 		log.Fatalf("could not create games schema: %s", err)
 	}
 
@@ -65,7 +65,7 @@ func getGameStats(cmd *cobra.Command, args []string) {
 }
 
 func cleanupDuplicateStats() error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func cleanupDuplicateStats() error {
 }
 
 func insertGameStatsPage(stats []internal.SingleGame) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}
@@ -254,8 +254,9 @@ func getGameStatsPage(season int) error {
 	return nil
 }
 
+// TODO create indexes
 func updateGamesWithPlayerIds() (int64, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return 0, err
 	}
@@ -282,8 +283,9 @@ func updateGamesWithPlayerIds() (int64, error) {
 	return result.RowsAffected()
 }
 
+// TODO create indexes
 func updateGamesWithGameIds() (int64, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return 0, err
 	}
@@ -310,8 +312,9 @@ func updateGamesWithGameIds() (int64, error) {
 	return result.RowsAffected()
 }
 
+// TODO create indexes
 func updateGamesWithTeamIds() (int64, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return 0, err
 	}

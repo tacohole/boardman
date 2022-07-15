@@ -118,7 +118,7 @@ func AddNbaId(ids []NbaData, team Team) (*string, error) {
 }
 
 func GetTeamCache() ([]Team, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}

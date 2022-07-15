@@ -23,7 +23,7 @@ func init() {
 func getTeamData(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	err := dbutil.PrepareSchema(internal.TeamSchema)
+	err := dbutil.PrepareSchema(internal.TeamSchema, "nba_data")
 	if err != nil {
 		log.Fatalf("can't create teams schema: %s", err)
 	}
@@ -57,7 +57,7 @@ func getTeamData(cmd *cobra.Command, args []string) {
 }
 
 func insertTeams(t []internal.Team) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}

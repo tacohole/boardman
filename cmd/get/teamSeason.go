@@ -202,7 +202,7 @@ func getTeamSeasons(cmd *cobra.Command, args []string) {
 }
 
 func sumTeamWins(ts internal.TeamSeason) (*int, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func sumTeamWins(ts internal.TeamSeason) (*int, error) {
 
 // return count of games where winner != team && is_postseason = false
 func sumTeamLosses(ts internal.TeamSeason) (*int, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +275,7 @@ func sumTeamLosses(ts internal.TeamSeason) (*int, error) {
 
 // for team in season where is_postseason = true
 func setMadePlayoffs(ts internal.TeamSeason) (*bool, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +316,7 @@ func setMadePlayoffs(ts internal.TeamSeason) (*bool, error) {
 }
 
 func sumPsWins(ts internal.TeamSeason) (*int, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -351,7 +351,7 @@ func sumPsWins(ts internal.TeamSeason) (*int, error) {
 }
 
 func sumPsLosses(ts internal.TeamSeason) (*int, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -387,7 +387,7 @@ func sumPsLosses(ts internal.TeamSeason) (*int, error) {
 }
 
 func calculatePlus(ts internal.TeamSeason) (*int, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -422,7 +422,7 @@ func calculatePlus(ts internal.TeamSeason) (*int, error) {
 }
 
 func calculateMinus(ts internal.TeamSeason) (*int, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -459,7 +459,7 @@ func calculateMinus(ts internal.TeamSeason) (*int, error) {
 
 // for player in team in season sum fgm on all games
 func sumFgm(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -497,7 +497,7 @@ func sumFgm(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum fga on all games
 func sumFga(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -535,7 +535,7 @@ func sumFga(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum ftm on all games
 func sumFtm(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -573,7 +573,7 @@ func sumFtm(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum fta on all games
 func sumFta(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -611,7 +611,7 @@ func sumFta(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum fg3m on all games
 func sumFg3m(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -649,7 +649,7 @@ func sumFg3m(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum fg3a on all games
 func sumFg3a(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -687,7 +687,7 @@ func sumFg3a(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum Oreb on all games
 func sumOreb(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -725,7 +725,7 @@ func sumOreb(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum dreb on all games
 func sumDreb(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -763,7 +763,7 @@ func sumDreb(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum ast on all games
 func sumAst(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -801,7 +801,7 @@ func sumAst(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum blk on all games
 func sumBlk(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -839,7 +839,7 @@ func sumBlk(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum stl on all games
 func sumStl(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -877,7 +877,7 @@ func sumStl(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum pf on all games
 func sumPf(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -915,7 +915,7 @@ func sumPf(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum turnovers on all games
 func sumTurnovers(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -953,7 +953,7 @@ func sumTurnovers(ts internal.TeamSeason) (*float32, error) {
 
 // for player in team in season sum pts on all games
 func sumPts(ts internal.TeamSeason) (*float32, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -991,7 +991,7 @@ func sumPts(ts internal.TeamSeason) (*float32, error) {
 
 // select player_uuid from gamestats where season = season and teamuuid = team.uuid
 func buildRoster(ts internal.TeamSeason) ([]uuid.UUID, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -1028,7 +1028,7 @@ func buildRoster(ts internal.TeamSeason) ([]uuid.UUID, error) {
 
 // select coach.uuid from coaches where season = season and team_uuid = team.uuid
 func buildCoaches(ts internal.TeamSeason) ([]uuid.UUID, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}
@@ -1062,7 +1062,7 @@ func buildCoaches(ts internal.TeamSeason) ([]uuid.UUID, error) {
 }
 
 func insertTeamSeasonRecord(ts internal.TeamSeason) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}

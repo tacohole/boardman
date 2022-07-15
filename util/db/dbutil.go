@@ -11,8 +11,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func DbConn() (*sqlx.DB, error) {
-	connString := os.Getenv("DATABASE_URL")
+func DbConn(dbName string) (*sqlx.DB, error) {
+	connString := os.Getenv("DATABASE_URL") + dbName
 	if connString == "" {
 		log.Fatalf("No database connection string provided")
 	}
@@ -36,8 +36,8 @@ func GenerateTimeout() (*time.Duration, error) {
 	return &timeout, nil
 }
 
-func PrepareSchema(schema string) error {
-	db, err := DbConn()
+func PrepareSchema(schema string, dbName string) error {
+	db, err := DbConn(dbName)
 	if err != nil {
 		return err
 	}

@@ -45,7 +45,7 @@ const (
 )
 
 func GetPlayerIdCache() ([]Player, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return nil, err
 	}

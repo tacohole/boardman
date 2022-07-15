@@ -24,7 +24,7 @@ func init() {
 func getPlayers(cmd *cobra.Command, args []string) {
 	loadDefaultVariables()
 
-	err := dbutil.PrepareSchema(internal.PlayerSchema)
+	err := dbutil.PrepareSchema(internal.PlayerSchema, "nba_data")
 	if err != nil {
 		log.Fatalf("can't create players schema: %s", err)
 	}
@@ -53,7 +53,7 @@ func getPlayers(cmd *cobra.Command, args []string) {
 
 // can fail silently with 0 rows updated, so we return count
 func updatePlayersWithTeamUUIDs() (int64, error) {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return 0, err
 	}
@@ -81,7 +81,7 @@ func updatePlayersWithTeamUUIDs() (int64, error) {
 }
 
 func insertPlayerRows(p []internal.Player) error {
-	db, err := dbutil.DbConn()
+	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
 	}
