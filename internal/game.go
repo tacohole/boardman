@@ -28,7 +28,7 @@ type Game struct {
 const (
 	GameSchema = `CREATE TABLE IF NOT EXISTS games(
 	uuid uuid PRIMARY KEY,
-	balldontlie_id INT,
+	balldontlie_id INT UNIQUE,
 	date DATE,
 	home_id UUID,
 	visitor_id UUID,

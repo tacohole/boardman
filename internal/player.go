@@ -29,7 +29,7 @@ type Player struct {
 const (
 	PlayerSchema = `CREATE TABLE IF NOT EXISTS players(
 	uuid uuid PRIMARY KEY,
-	balldontlie_id INT,
+	balldontlie_id INT UNIQUE,
 	first_name TEXT,
 	last_name TEXT,
 	position TEXT,
@@ -44,6 +44,7 @@ const (
 	);`
 )
 
+// TODO TEST
 func GetPlayerIdCache() ([]Player, error) {
 	db, err := dbutil.DbConn("nba_data")
 	if err != nil {

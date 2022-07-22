@@ -2,6 +2,7 @@ package httpHelpers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -22,7 +23,7 @@ func MakeHttpRequest(method string, url string) (*http.Response, error) {
 
 	request.Header.Set("Content-Type", "application/json")
 
-	fmt.Printf("sending request to %s \n", url)
+	log.Printf("sending request to %s \n", url)
 
 	response, err := client.Do(request)
 	if err != nil {

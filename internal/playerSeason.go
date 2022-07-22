@@ -33,7 +33,7 @@ type PlayerSeason struct {
 const (
 	PlayerSeasonSchema = `CREATE TABLE IF NOT EXISTS player_season(
 		uuid UUID,
-		balldontlie_id INT,
+		balldontlie_id INT UNIQUE,
 		season INT,
 		avg_min TEXT,
 		fgm NUMERIC(4),

@@ -36,12 +36,13 @@ func getPlayers(cmd *cobra.Command, args []string) {
 		log.Fatalf("can't get players: %s", err)
 	}
 
-	if err := insertPlayerRows(players); err != nil {
-		log.Fatalf("Could not perform insert:, %s", err)
+	for _, p := range players {
+		if err := insertPlayerRow(p); err != nil {
+			log.Printf("Could not perform insert for %s %s:, %v", p.FirstName, p.LastName, err)
+		}
 	}
-	if verbose {
-		log.Printf("Inserted %d players", len(players))
-	}
+
+	log.Printf("Inserted %d players", len(players))
 
 	count, err := updatePlayersWithTeamUUIDs()
 	remaining := count - int64(len(players))
@@ -80,7 +81,7 @@ func updatePlayersWithTeamUUIDs() (int64, error) {
 	return result.RowsAffected()
 }
 
-func insertPlayerRows(p []internal.Player) error {
+func insertPlayerRow(p internal.Player) error {
 	db, err := dbutil.DbConn("nba_data")
 	if err != nil {
 		return err
@@ -126,7 +127,5 @@ func insertPlayerRows(p []internal.Player) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
-
 }

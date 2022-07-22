@@ -22,7 +22,7 @@ type Coach struct {
 }
 
 const (
-	CoachesSchema = `CREATE TABLE coaches(
+	CoachesSchema = `CREATE TABLE IF NOT EXISTS coaches(
 	uuid UUID PRIMARY KEY,
 	first_name TEXT,
 	last_name TEXT,
